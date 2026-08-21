@@ -17,7 +17,18 @@ namespace Nightfall.UnityMvp
             attackClock=0;hitEvent=null;SetVisible(true);ApplyPose(0);
         }
         private SpriteRenderer Make(string name,int order){var go=new GameObject(name);go.transform.SetParent(transform,false);var r=go.AddComponent<SpriteRenderer>();r.sortingOrder=order;return r;}
-        public void SetMovement(Vector3 direction,bool moving){if(direction.sqrMagnitude>.001f){facing=new Vector2(direction.x,direction.z).normalized;body.SetFacing(direction);}body.SetMoving(moving);}
+        public void SetMovement(Vector3 direction,bool moving)
+        {
+            // Keep the attack direction locked for the whole one-shot clip. Updating it
+            // from movement every frame makes the renderer jump between atlas rows and
+            // reads as the character orbiting around the gameplay transform.
+            if(attackClock<=0&&direction.sqrMagnitude>.001f)
+            {
+                facing=new Vector2(direction.x,direction.z).normalized;
+                body.SetFacing(direction);
+            }
+            body.SetMoving(moving);
+        }
         public void PlayAttack(Vector3 direction,Action onHit)
         {
             if(direction.sqrMagnitude>.001f){facing=new Vector2(direction.x,direction.z).normalized;body.SetFacing(direction);}attackClock=profile.attackDuration;hitSent=false;hitEvent=onHit;body.Play("attack",true);

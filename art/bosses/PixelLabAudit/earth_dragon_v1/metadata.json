@@ -1,0 +1,36 @@
+{
+  "group_id": "637d2ed6-a58e-4bb0-89b1-c3db95288106",
+  "states": [
+    {
+      "character": {
+        "id": "61844371-89f1-465c-9c88-155dc9ef5c72",
+        "name": "Idle",
+        "prompt": "Massive earth dragon boss for a dark urban-fantasy survival game: low powerful four-legged stance, horned stone-scaled head, layered cracked basalt armor plates, compact folded wings or stone shoulder fins, thick tail, subtle dormant amber cracks with no emitted glow, readable heavy silhouette. Full body, centered, consistent scale and foot contact across all directions. No rider, no weapon, no projectile, no particles, no aura, no text.",
+        "size": {
+          "width": 136,
+          "height": 136
+        },
+        "template_id": "lion",
+        "directions": 8,
+        "view": "high top-down",
+        "created_at": "2026-08-21T11:25:39.282430+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-08-21T12:04:18.775136"
+}

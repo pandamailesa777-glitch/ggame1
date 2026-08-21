@@ -49,6 +49,11 @@ def remove_detached_yellow_specks(image: Image.Image) -> Image.Image:
 
 def padded_frame(path: Path) -> Image.Image:
     image = remove_detached_yellow_specks(Image.open(path).convert("RGBA"))
+    if image.width > TARGET or image.height > TARGET:
+        raise ValueError(
+            f"source frame exceeds {TARGET}x{TARGET} and would be clipped: "
+            f"{path} is {image.width}x{image.height}"
+        )
     packed = Image.new("RGBA", (TARGET, TARGET), (0, 0, 0, 0))
     packed.alpha_composite(image, ((TARGET - image.width) // 2, (TARGET - image.height) // 2))
     return packed

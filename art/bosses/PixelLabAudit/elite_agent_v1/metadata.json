@@ -1,0 +1,36 @@
+{
+  "group_id": "977c7c40-be93-44e3-90d1-7109a0d83dc4",
+  "states": [
+    {
+      "character": {
+        "id": "93a87fa8-615b-4906-820e-b1550d48be20",
+        "name": "Idle",
+        "prompt": "Elite Bureau field-agent boss for a dark urban-fantasy survival game: imposing armored humanoid in dark navy tactical coat, reinforced plated vest, angular cyan identification strips without glow, sealed high collar, authoritative broad-shouldered silhouette, empty visible hands. Full body, centered, consistent scale and foot contact across all directions. No gun, no weapon, no projectile, no particles, no aura, no text.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "high top-down",
+        "created_at": "2026-08-21T11:25:31.275045+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-08-21T12:04:19.330415"
+}
