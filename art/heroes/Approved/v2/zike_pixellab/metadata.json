@@ -1,0 +1,36 @@
+{
+  "group_id": "73c85ca4-c899-4478-87f0-8e1a6beef06a",
+  "states": [
+    {
+      "character": {
+        "id": "25c9fcfd-b60c-42c1-b5d6-713c761f5b88",
+        "name": "Idle",
+        "prompt": "Approved canonical Zike game sprite. Adult male silver-white cat furion lightning swordsman, silver tousled hair, matching ears and pale tail, green eyes, black clothing with restrained fur collar and dark cloak silhouette. Preserve the supplied sprite exactly: same individual, face, outfit, colors, proportions, silhouette and scale. Empty hands. Absolutely no weapon, katana, sword, sheath, lightning, magic, particles, text, shadow or background. Generate consistent rotations only.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "high top-down",
+        "created_at": "2026-08-21T08:50:28.145758+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-08-21T08:54:38.187768"
+}

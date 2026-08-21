@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "entities": [
+    {
+      "id": "hero_amelia", "entityType": "hero", "scale": 1.12, "pivotX": 0.5, "pivotY": 0.84, "sortOffset": 0,
+      "animations": [
+        {"id":"idle","sheet":"heroes_directional_v1","layout":"mapped_columns","columns":7,"rows":3,"entityRow":0,"frames":1,"directions":8,"fps":1,"loop":true,"directionMap":[5,1,0,1,2,4,3,4],"mirrorDirections":[1,5]},
+        {"id":"move","sheet":"heroes_directional_v1","layout":"mapped_columns","columns":7,"rows":3,"entityRow":0,"frames":1,"directions":8,"fps":8,"loop":true,"directionMap":[5,1,0,1,2,4,3,4],"mirrorDirections":[1,5]},
+        {"id":"attack","sheet":"heroes_directional_v1","layout":"mapped_columns","columns":7,"rows":3,"entityRow":0,"frames":1,"directions":8,"fps":8,"loop":false,"directionMap":[5,1,0,1,2,4,3,4],"mirrorDirections":[1,5]}
+      ]
+    },
+    {
+      "id": "hero_sam", "entityType": "hero", "scale": 1.05, "pivotX": 0.5, "pivotY": 0.84, "sortOffset": 0,
+      "animations": [
+        {"id":"idle","sheet":"heroes_directional_v1","layout":"mapped_columns","columns":7,"rows":3,"entityRow":1,"frames":1,"directions":8,"fps":1,"loop":true,"directionMap":[5,1,0,1,2,4,3,4],"mirrorDirections":[1,5]},
+        {"id":"move","sheet":"heroes_directional_v1","layout":"mapped_columns","columns":7,"rows":3,"entityRow":1,"frames":1,"directions":8,"fps":8,"loop":true,"directionMap":[5,1,0,1,2,4,3,4],"mirrorDirections":[1,5]},
+        {"id":"attack","sheet":"heroes_directional_v1","layout":"mapped_columns","columns":7,"rows":3,"entityRow":1,"frames":1,"directions":8,"fps":8,"loop":false,"directionMap":[5,1,0,1,2,4,3,4],"mirrorDirections":[1,5]}
+      ]
+    },
+    {
+      "id": "hero_zike", "entityType": "hero", "scale": 1.05, "pivotX": 0.5, "pivotY": 0.84, "sortOffset": 0,
+      "animations": [
+        {"id":"idle","sheet":"heroes_directional_v1","layout":"mapped_columns","columns":7,"rows":3,"entityRow":2,"frames":1,"directions":8,"fps":1,"loop":true,"directionMap":[5,1,0,1,2,4,3,4],"mirrorDirections":[1,5]},
+        {"id":"move","sheet":"heroes_directional_v1","layout":"mapped_columns","columns":7,"rows":3,"entityRow":2,"frames":1,"directions":8,"fps":8,"loop":true,"directionMap":[5,1,0,1,2,4,3,4],"mirrorDirections":[1,5]},
+        {"id":"attack","sheet":"heroes_directional_v1","layout":"mapped_columns","columns":7,"rows":3,"entityRow":2,"frames":1,"directions":8,"fps":8,"loop":false,"directionMap":[5,1,0,1,2,4,3,4],"mirrorDirections":[1,5]}
+      ]
+    },
+    {
+      "id": "enemy_zombie_test", "entityType": "enemy", "scale": 1.0, "pivotX": 0.5, "pivotY": 0.9, "sortOffset": 0, "fallbackColor": "#617d50",
+      "animations": [
+        {"id":"idle","layout":"direction_rows","columns":1,"rows":4,"frames":1,"directions":4,"fps":2,"loop":true},
+        {"id":"move","layout":"direction_rows","columns":1,"rows":4,"frames":1,"directions":4,"fps":6,"loop":true},
+        {"id":"attack","layout":"direction_rows","columns":1,"rows":4,"frames":1,"directions":4,"fps":8,"loop":false},
+        {"id":"hit","layout":"direction_rows","columns":1,"rows":4,"frames":1,"directions":4,"fps":10,"loop":false},
+        {"id":"death","layout":"direction_rows","columns":1,"rows":4,"frames":1,"directions":4,"fps":4,"loop":false}
+      ]
+    }
+  ]
+}

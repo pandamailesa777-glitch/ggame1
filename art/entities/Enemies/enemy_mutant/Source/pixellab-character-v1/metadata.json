@@ -1,0 +1,36 @@
+{
+  "group_id": "732d8089-bc6f-4dae-aaee-e1a6f3bcbfad",
+  "states": [
+    {
+      "character": {
+        "id": "0b3270f4-249f-4512-ad94-1ac95fc5098f",
+        "name": "Idle",
+        "prompt": "Large heavy humanoid magical mutant created by Bureau experiments, broad asymmetric torso and oversized striking arm, torn containment clothing, restrained teal-violet magical scars, slow powerful mini-heavy enemy, no gore, not a boss, full body, transparent background.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "high top-down",
+        "created_at": "2026-08-21T05:10:13.514998+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-08-21T05:13:38.336746"
+}

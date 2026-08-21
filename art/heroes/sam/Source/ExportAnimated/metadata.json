@@ -1,0 +1,103 @@
+{
+  "group_id": "2744d505-c33e-42bd-aadb-9d91a16d7a1c",
+  "states": [
+    {
+      "character": {
+        "id": "f715097e-f7ee-4650-a42d-2de0b8e9b72b",
+        "name": "Idle",
+        "prompt": "Sam, canonical black-haired wolf furion death mage with one prominent white forelock, dark modern combat clothes, red-black magical staff held visibly, dark wolf ears and tail, compact readable mobile survivors-like full-body sprite. Preserve the supplied sprite identity, outfit, staff, palette and proportions. Clean transparent edges, no extra fragments, no background.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "high top-down",
+        "created_at": "2026-08-21T05:31:14.703974+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "move": {
+            "north-west": [
+              "Idle/animations/move/north-west/frame_000.png",
+              "Idle/animations/move/north-west/frame_001.png",
+              "Idle/animations/move/north-west/frame_002.png",
+              "Idle/animations/move/north-west/frame_003.png",
+              "Idle/animations/move/north-west/frame_004.png",
+              "Idle/animations/move/north-west/frame_005.png"
+            ],
+            "south-west": [
+              "Idle/animations/move/south-west/frame_000.png",
+              "Idle/animations/move/south-west/frame_001.png",
+              "Idle/animations/move/south-west/frame_002.png",
+              "Idle/animations/move/south-west/frame_003.png",
+              "Idle/animations/move/south-west/frame_004.png",
+              "Idle/animations/move/south-west/frame_005.png"
+            ],
+            "south": [
+              "Idle/animations/move/south/frame_000.png",
+              "Idle/animations/move/south/frame_001.png",
+              "Idle/animations/move/south/frame_002.png",
+              "Idle/animations/move/south/frame_003.png",
+              "Idle/animations/move/south/frame_004.png",
+              "Idle/animations/move/south/frame_005.png"
+            ],
+            "east": [
+              "Idle/animations/move/east/frame_000.png",
+              "Idle/animations/move/east/frame_001.png",
+              "Idle/animations/move/east/frame_002.png",
+              "Idle/animations/move/east/frame_003.png",
+              "Idle/animations/move/east/frame_004.png",
+              "Idle/animations/move/east/frame_005.png"
+            ],
+            "south-east": [
+              "Idle/animations/move/south-east/frame_000.png",
+              "Idle/animations/move/south-east/frame_001.png",
+              "Idle/animations/move/south-east/frame_002.png",
+              "Idle/animations/move/south-east/frame_003.png",
+              "Idle/animations/move/south-east/frame_004.png",
+              "Idle/animations/move/south-east/frame_005.png"
+            ],
+            "west": [
+              "Idle/animations/move/west/frame_000.png",
+              "Idle/animations/move/west/frame_001.png",
+              "Idle/animations/move/west/frame_002.png",
+              "Idle/animations/move/west/frame_003.png",
+              "Idle/animations/move/west/frame_004.png",
+              "Idle/animations/move/west/frame_005.png"
+            ],
+            "north": [
+              "Idle/animations/move/north/frame_000.png",
+              "Idle/animations/move/north/frame_001.png",
+              "Idle/animations/move/north/frame_002.png",
+              "Idle/animations/move/north/frame_003.png",
+              "Idle/animations/move/north/frame_004.png",
+              "Idle/animations/move/north/frame_005.png"
+            ],
+            "north-east": [
+              "Idle/animations/move/north-east/frame_000.png",
+              "Idle/animations/move/north-east/frame_001.png",
+              "Idle/animations/move/north-east/frame_002.png",
+              "Idle/animations/move/north-east/frame_003.png",
+              "Idle/animations/move/north-east/frame_004.png",
+              "Idle/animations/move/north-east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-08-21T05:54:29.841895"
+}

@@ -1,0 +1,36 @@
+{
+  "group_id": "3808d4c5-d3c2-43ec-8a1f-3f30d203568d",
+  "states": [
+    {
+      "character": {
+        "id": "303059f3-c57f-45dc-86b2-2de670f73597",
+        "name": "Idle",
+        "prompt": "Amelia, canonical white-haired cat furion priestess and light mage, white and gold battle vestments, warm golden eyes, white cat ears and tail, elegant holy whip at belt, compact readable mobile survivors-like full-body sprite. Preserve the supplied sprite identity, outfit palette, feline features and proportions. Clean transparent edges, no extra fragments, no background.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "high top-down",
+        "created_at": "2026-08-21T05:31:14.425794+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-08-21T05:38:01.534293"
+}

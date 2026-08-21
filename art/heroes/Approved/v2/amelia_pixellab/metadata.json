@@ -1,0 +1,36 @@
+{
+  "group_id": "dba3709c-b367-4357-abca-31c03a2391ca",
+  "states": [
+    {
+      "character": {
+        "id": "37ca6052-47fa-44f7-952f-201f1c57c0e6",
+        "name": "Idle",
+        "prompt": "Approved canonical Amelia game sprite. Adult female white cat furion priestess, white hair, white ears and tail, warm golden eyes, white black and restrained gold urban-fantasy combat clothing. Preserve the supplied sprite exactly: same individual, face, outfit, colors, proportions, silhouette and scale. Empty hands. Absolutely no weapon, whip, staff, sword, sheath, magic, particles, text, shadow or background. Generate consistent rotations only.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "high top-down",
+        "created_at": "2026-08-21T08:50:27.704909+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-08-21T08:54:37.887325"
+}

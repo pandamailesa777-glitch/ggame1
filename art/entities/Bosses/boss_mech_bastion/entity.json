@@ -1,0 +1,24 @@
+{
+  "id": "boss_mech_bastion",
+  "displayName": "Bastion Anti-Magic Mech Suit",
+  "entityType": "boss",
+  "description": "a 3-meter piloted anti-magic military exosuit, heavy practical armor, hydraulics, servos, sensors and compact weapon modules, worn and battle-damaged",
+  "directions": 8,
+  "scale": 1.65,
+  "pivotX": 0.5,
+  "pivotY": 0.92,
+  "sortOffset": 0,
+  "fallbackColor": "#7e8990",
+  "visualNotes": "Realistic corporate military engineering, compact torso, thick load-bearing legs, visible hydraulic joints, gun module, anti-magic emitter; no giant-robot scale and minimal fantasy ornament.",
+  "gameplayReadability": "Large unmistakable silhouette; weapon muzzle, missile ports and suppression emitter remain visible; phase two adds sparse sparks, smoke and missing armor panels.",
+  "animations": [
+    { "id": "move", "frames": 8, "fps": 7, "loop": true },
+    { "id": "machine_gun", "frames": 6, "fps": 12, "loop": false },
+    { "id": "missiles", "frames": 7, "fps": 10, "loop": false },
+    { "id": "ground_slam", "frames": 8, "fps": 11, "loop": false },
+    { "id": "charge", "frames": 6, "fps": 14, "loop": false },
+    { "id": "phase_two", "frames": 6, "fps": 8, "loop": false },
+    { "id": "hit", "frames": 3, "fps": 12, "loop": false },
+    { "id": "death", "frames": 10, "fps": 9, "loop": false }
+  ]
+}

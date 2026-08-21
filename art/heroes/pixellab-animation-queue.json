@@ -1,0 +1,7 @@
+{
+  "hero_amelia": "303059f3-c57f-45dc-86b2-2de670f73597",
+  "hero_sam": "f715097e-f7ee-4650-a42d-2de0b8e9b72b",
+  "hero_zike": "fe2b01fe-c2a8-4cb6-86fd-8f3f39d95df8",
+  "source": "cleaned 96x96 canonical game sprites",
+  "next": ["review rotations", "move animation", "attack/cast animation", "pack and import"]
+}

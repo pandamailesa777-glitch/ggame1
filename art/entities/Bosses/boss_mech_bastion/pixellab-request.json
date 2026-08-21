@@ -1,0 +1,61 @@
+{
+    "description":  "Production-ready 2.5D mobile survivors-like game sprite of Bastion Anti-Magic Mech Suit, a 3-meter piloted anti-magic military exosuit, heavy practical armor, hydraulics, servos, sensors and compact weapon modules, worn and battle-damaged.\nUrban fantasy and restrained near-future cyberpunk. Semi-realistic hand-painted character, clean readable silhouette, compact proportions, crisp material separation, medium contrast. Isometric three-quarter top-down camera, approximately 35 degrees downward, orthographic look, character centered, full body visible, consistent scale and ground contact. Neutral cool night key light from upper left with subtle warm industrial rim light. Transparent background, no floor, no cast shadow outside the character, no text, no UI, no border, no scenery, no extra characters, no cropped body parts.\nGenerate 8 consistent directions in clockwise order: south, southwest, west, northwest, north, northeast, east, southeast. Preserve costume, anatomy, palette, equipment and proportions across every direction and frame. Animation set: move: 8 frames at 7 FPS; machine_gun: 6 frames at 12 FPS; missiles: 7 frames at 10 FPS; ground_slam: 8 frames at 11 FPS; charge: 6 frames at 14 FPS; phase_two: 6 frames at 8 FPS; hit: 3 frames at 12 FPS; death: 10 frames at 9 FPS. Each frame must fit a square cell with at least 8 percent transparent padding. Direction rows, animation-frame columns. Avoid photorealism, chibi proportions, pixel art, excessive particles, motion blur and baked background.\nUnique visual notes: Realistic corporate military engineering, compact torso, thick load-bearing legs, visible hydraulic joints, gun module, anti-magic emitter; no giant-robot scale and minimal fantasy ornament.\nGameplay readability: Large unmistakable silhouette; weapon muzzle, missile ports and suppression emitter remain visible; phase two adds sparse sparks, smoke and missing armor panels.",
+    "image_size":  {
+                       "width":  256,
+                       "height":  256
+                   },
+    "directions":  8,
+    "no_background":  true,
+    "view":  "low top-down",
+    "proportions":  "adult heroic",
+    "animations":  [
+                       {
+                           "id":  "move",
+                           "frames":  8,
+                           "fps":  7,
+                           "loop":  true
+                       },
+                       {
+                           "id":  "machine_gun",
+                           "frames":  6,
+                           "fps":  12,
+                           "loop":  false
+                       },
+                       {
+                           "id":  "missiles",
+                           "frames":  7,
+                           "fps":  10,
+                           "loop":  false
+                       },
+                       {
+                           "id":  "ground_slam",
+                           "frames":  8,
+                           "fps":  11,
+                           "loop":  false
+                       },
+                       {
+                           "id":  "charge",
+                           "frames":  6,
+                           "fps":  14,
+                           "loop":  false
+                       },
+                       {
+                           "id":  "phase_two",
+                           "frames":  6,
+                           "fps":  8,
+                           "loop":  false
+                       },
+                       {
+                           "id":  "hit",
+                           "frames":  3,
+                           "fps":  12,
+                           "loop":  false
+                       },
+                       {
+                           "id":  "death",
+                           "frames":  10,
+                           "fps":  9,
+                           "loop":  false
+                       }
+                   ]
+}

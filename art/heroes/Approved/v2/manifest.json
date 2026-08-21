@@ -1,0 +1,30 @@
+{
+  "version": "v2",
+  "status": "approved_runtime_walk_v2_locked",
+  "canvas": { "width": 96, "height": 96 },
+  "view": "high top-down",
+  "directions": ["east", "north-east", "north", "north-west", "west", "south-west", "south", "south-east"],
+  "weapon_policy": "body sprites contain no weapon; weapon is a separate synchronized visual layer",
+  "runtime_lock": {
+    "locked_on": "2026-08-21",
+    "shared_width_multiplier": 1.30,
+    "note": "Hero body art, apparent heights and width multiplier are approved. Do not revise without explicit user request. Weapon size, pivot and attack trajectory remain pending until attack animation approval."
+  },
+  "heroes": {
+    "amelia": {
+      "base": "amelia_south_approved_96.png",
+      "pixellab_character_id": "37ca6052-47fa-44f7-952f-201f1c57c0e6",
+      "canonical_weapon": "holy whip"
+    },
+    "sam": {
+      "base": "sam_south_approved_96.png",
+      "pixellab_character_id": "9d70ae5f-e376-4ed8-a1a2-9791390fc1a1",
+      "canonical_weapon": "simple wooden quarterstaff"
+    },
+    "zike": {
+      "base": "zike_south_approved_96.png",
+      "pixellab_character_id": "25c9fcfd-b60c-42c1-b5d6-713c761f5b88",
+      "canonical_weapon": "single katana"
+    }
+  }
+}

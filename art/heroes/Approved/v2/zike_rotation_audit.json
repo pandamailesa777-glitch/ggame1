@@ -1,0 +1,98 @@
+[
+  {
+    "direction": "east",
+    "bounds": [
+      33,
+      15,
+      59,
+      88
+    ],
+    "width": 26,
+    "height": 73,
+    "feet_y": 88
+  },
+  {
+    "direction": "north-east",
+    "bounds": [
+      29,
+      15,
+      66,
+      87
+    ],
+    "width": 37,
+    "height": 72,
+    "feet_y": 87
+  },
+  {
+    "direction": "north",
+    "bounds": [
+      24,
+      15,
+      72,
+      86
+    ],
+    "width": 48,
+    "height": 71,
+    "feet_y": 86
+  },
+  {
+    "direction": "north-west",
+    "bounds": [
+      30,
+      15,
+      68,
+      87
+    ],
+    "width": 38,
+    "height": 72,
+    "feet_y": 87
+  },
+  {
+    "direction": "west",
+    "bounds": [
+      38,
+      15,
+      63,
+      88
+    ],
+    "width": 25,
+    "height": 73,
+    "feet_y": 88
+  },
+  {
+    "direction": "south-west",
+    "bounds": [
+      31,
+      16,
+      67,
+      89
+    ],
+    "width": 36,
+    "height": 73,
+    "feet_y": 89
+  },
+  {
+    "direction": "south",
+    "bounds": [
+      28,
+      18,
+      68,
+      89
+    ],
+    "width": 40,
+    "height": 71,
+    "feet_y": 89
+  },
+  {
+    "direction": "south-east",
+    "bounds": [
+      29,
+      16,
+      68,
+      89
+    ],
+    "width": 39,
+    "height": 73,
+    "feet_y": 89
+  }
+]

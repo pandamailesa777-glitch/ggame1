@@ -1,0 +1,36 @@
+{
+  "group_id": "754653a8-c4dc-41e1-8134-242e7ce9ac1f",
+  "states": [
+    {
+      "character": {
+        "id": "9d70ae5f-e376-4ed8-a1a2-9791390fc1a1",
+        "name": "Idle",
+        "prompt": "Approved canonical Sam game sprite. Adult male black wolf furion monk, black shaggy hair with one distinctive white forelock, black wolf ears and dark tail, simple fitted black urban-fantasy clothing. Preserve the supplied sprite exactly: same individual, face, outfit, tattoo, colors, proportions, silhouette and scale. Empty hands. Absolutely no weapon, staff, stick, sword, sheath, magic, particles, text, shadow or background. Generate consistent rotations only.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "high top-down",
+        "created_at": "2026-08-21T08:50:28.591438+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-08-21T08:54:33.645827"
+}

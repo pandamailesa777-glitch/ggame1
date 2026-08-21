@@ -1,0 +1,293 @@
+{
+  "group_id": "dba3709c-b367-4357-abca-31c03a2391ca",
+  "states": [
+    {
+      "character": {
+        "id": "37ca6052-47fa-44f7-952f-201f1c57c0e6",
+        "name": "Idle",
+        "prompt": "Approved canonical Amelia game sprite. Adult female white cat furion priestess, white hair, white ears and tail, warm golden eyes, white black and restrained gold urban-fantasy combat clothing. Preserve the supplied sprite exactly: same individual, face, outfit, colors, proportions, silhouette and scale. Empty hands. Absolutely no weapon, whip, staff, sword, sheath, magic, particles, text, shadow or background. Generate consistent rotations only.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "high top-down",
+        "created_at": "2026-08-21T08:50:27.704909+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "approved_walk": {
+            "north": [
+              "Idle/animations/approved_walk/north/frame_000.png",
+              "Idle/animations/approved_walk/north/frame_001.png",
+              "Idle/animations/approved_walk/north/frame_002.png",
+              "Idle/animations/approved_walk/north/frame_003.png",
+              "Idle/animations/approved_walk/north/frame_004.png",
+              "Idle/animations/approved_walk/north/frame_005.png"
+            ],
+            "west": [
+              "Idle/animations/approved_walk/west/frame_000.png",
+              "Idle/animations/approved_walk/west/frame_001.png",
+              "Idle/animations/approved_walk/west/frame_002.png",
+              "Idle/animations/approved_walk/west/frame_003.png",
+              "Idle/animations/approved_walk/west/frame_004.png",
+              "Idle/animations/approved_walk/west/frame_005.png"
+            ],
+            "east": [
+              "Idle/animations/approved_walk/east/frame_000.png",
+              "Idle/animations/approved_walk/east/frame_001.png",
+              "Idle/animations/approved_walk/east/frame_002.png",
+              "Idle/animations/approved_walk/east/frame_003.png",
+              "Idle/animations/approved_walk/east/frame_004.png",
+              "Idle/animations/approved_walk/east/frame_005.png"
+            ],
+            "south": [
+              "Idle/animations/approved_walk/south/frame_000.png",
+              "Idle/animations/approved_walk/south/frame_001.png",
+              "Idle/animations/approved_walk/south/frame_002.png",
+              "Idle/animations/approved_walk/south/frame_003.png",
+              "Idle/animations/approved_walk/south/frame_004.png",
+              "Idle/animations/approved_walk/south/frame_005.png"
+            ]
+          },
+          "attack_body_v1_audit": {
+            "north-east": [
+              "Idle/animations/attack_body_v1_audit/north-east/frame_000.png",
+              "Idle/animations/attack_body_v1_audit/north-east/frame_001.png",
+              "Idle/animations/attack_body_v1_audit/north-east/frame_002.png",
+              "Idle/animations/attack_body_v1_audit/north-east/frame_003.png",
+              "Idle/animations/attack_body_v1_audit/north-east/frame_004.png",
+              "Idle/animations/attack_body_v1_audit/north-east/frame_005.png",
+              "Idle/animations/attack_body_v1_audit/north-east/frame_006.png"
+            ],
+            "south-west": [
+              "Idle/animations/attack_body_v1_audit/south-west/frame_000.png",
+              "Idle/animations/attack_body_v1_audit/south-west/frame_001.png",
+              "Idle/animations/attack_body_v1_audit/south-west/frame_002.png",
+              "Idle/animations/attack_body_v1_audit/south-west/frame_003.png",
+              "Idle/animations/attack_body_v1_audit/south-west/frame_004.png",
+              "Idle/animations/attack_body_v1_audit/south-west/frame_005.png",
+              "Idle/animations/attack_body_v1_audit/south-west/frame_006.png"
+            ],
+            "north-west": [
+              "Idle/animations/attack_body_v1_audit/north-west/frame_000.png",
+              "Idle/animations/attack_body_v1_audit/north-west/frame_001.png",
+              "Idle/animations/attack_body_v1_audit/north-west/frame_002.png",
+              "Idle/animations/attack_body_v1_audit/north-west/frame_003.png",
+              "Idle/animations/attack_body_v1_audit/north-west/frame_004.png",
+              "Idle/animations/attack_body_v1_audit/north-west/frame_005.png",
+              "Idle/animations/attack_body_v1_audit/north-west/frame_006.png"
+            ],
+            "north": [
+              "Idle/animations/attack_body_v1_audit/north/frame_000.png",
+              "Idle/animations/attack_body_v1_audit/north/frame_001.png",
+              "Idle/animations/attack_body_v1_audit/north/frame_002.png",
+              "Idle/animations/attack_body_v1_audit/north/frame_003.png",
+              "Idle/animations/attack_body_v1_audit/north/frame_004.png",
+              "Idle/animations/attack_body_v1_audit/north/frame_005.png",
+              "Idle/animations/attack_body_v1_audit/north/frame_006.png"
+            ],
+            "south": [
+              "Idle/animations/attack_body_v1_audit/south/frame_000.png",
+              "Idle/animations/attack_body_v1_audit/south/frame_001.png",
+              "Idle/animations/attack_body_v1_audit/south/frame_002.png",
+              "Idle/animations/attack_body_v1_audit/south/frame_003.png",
+              "Idle/animations/attack_body_v1_audit/south/frame_004.png",
+              "Idle/animations/attack_body_v1_audit/south/frame_005.png",
+              "Idle/animations/attack_body_v1_audit/south/frame_006.png"
+            ],
+            "east": [
+              "Idle/animations/attack_body_v1_audit/east/frame_000.png",
+              "Idle/animations/attack_body_v1_audit/east/frame_001.png",
+              "Idle/animations/attack_body_v1_audit/east/frame_002.png",
+              "Idle/animations/attack_body_v1_audit/east/frame_003.png",
+              "Idle/animations/attack_body_v1_audit/east/frame_004.png",
+              "Idle/animations/attack_body_v1_audit/east/frame_005.png",
+              "Idle/animations/attack_body_v1_audit/east/frame_006.png"
+            ],
+            "west": [
+              "Idle/animations/attack_body_v1_audit/west/frame_000.png",
+              "Idle/animations/attack_body_v1_audit/west/frame_001.png",
+              "Idle/animations/attack_body_v1_audit/west/frame_002.png",
+              "Idle/animations/attack_body_v1_audit/west/frame_003.png",
+              "Idle/animations/attack_body_v1_audit/west/frame_004.png",
+              "Idle/animations/attack_body_v1_audit/west/frame_005.png",
+              "Idle/animations/attack_body_v1_audit/west/frame_006.png"
+            ],
+            "south-east": [
+              "Idle/animations/attack_body_v1_audit/south-east/frame_000.png",
+              "Idle/animations/attack_body_v1_audit/south-east/frame_001.png",
+              "Idle/animations/attack_body_v1_audit/south-east/frame_002.png",
+              "Idle/animations/attack_body_v1_audit/south-east/frame_003.png",
+              "Idle/animations/attack_body_v1_audit/south-east/frame_004.png",
+              "Idle/animations/attack_body_v1_audit/south-east/frame_005.png",
+              "Idle/animations/attack_body_v1_audit/south-east/frame_006.png"
+            ]
+          },
+          "walk_v2_audited": {
+            "north": [
+              "Idle/animations/walk_v2_audited/north/frame_000.png",
+              "Idle/animations/walk_v2_audited/north/frame_001.png",
+              "Idle/animations/walk_v2_audited/north/frame_002.png",
+              "Idle/animations/walk_v2_audited/north/frame_003.png",
+              "Idle/animations/walk_v2_audited/north/frame_004.png",
+              "Idle/animations/walk_v2_audited/north/frame_005.png",
+              "Idle/animations/walk_v2_audited/north/frame_006.png"
+            ],
+            "south-west": [
+              "Idle/animations/walk_v2_audited/south-west/frame_000.png",
+              "Idle/animations/walk_v2_audited/south-west/frame_001.png",
+              "Idle/animations/walk_v2_audited/south-west/frame_002.png",
+              "Idle/animations/walk_v2_audited/south-west/frame_003.png",
+              "Idle/animations/walk_v2_audited/south-west/frame_004.png",
+              "Idle/animations/walk_v2_audited/south-west/frame_005.png",
+              "Idle/animations/walk_v2_audited/south-west/frame_006.png"
+            ],
+            "east": [
+              "Idle/animations/walk_v2_audited/east/frame_000.png",
+              "Idle/animations/walk_v2_audited/east/frame_001.png",
+              "Idle/animations/walk_v2_audited/east/frame_002.png",
+              "Idle/animations/walk_v2_audited/east/frame_003.png",
+              "Idle/animations/walk_v2_audited/east/frame_004.png",
+              "Idle/animations/walk_v2_audited/east/frame_005.png",
+              "Idle/animations/walk_v2_audited/east/frame_006.png"
+            ],
+            "south-east": [
+              "Idle/animations/walk_v2_audited/south-east/frame_000.png",
+              "Idle/animations/walk_v2_audited/south-east/frame_001.png",
+              "Idle/animations/walk_v2_audited/south-east/frame_002.png",
+              "Idle/animations/walk_v2_audited/south-east/frame_003.png",
+              "Idle/animations/walk_v2_audited/south-east/frame_004.png",
+              "Idle/animations/walk_v2_audited/south-east/frame_005.png",
+              "Idle/animations/walk_v2_audited/south-east/frame_006.png"
+            ],
+            "south": [
+              "Idle/animations/walk_v2_audited/south/frame_000.png",
+              "Idle/animations/walk_v2_audited/south/frame_001.png",
+              "Idle/animations/walk_v2_audited/south/frame_002.png",
+              "Idle/animations/walk_v2_audited/south/frame_003.png",
+              "Idle/animations/walk_v2_audited/south/frame_004.png",
+              "Idle/animations/walk_v2_audited/south/frame_005.png",
+              "Idle/animations/walk_v2_audited/south/frame_006.png"
+            ],
+            "north-west": [
+              "Idle/animations/walk_v2_audited/north-west/frame_000.png",
+              "Idle/animations/walk_v2_audited/north-west/frame_001.png",
+              "Idle/animations/walk_v2_audited/north-west/frame_002.png",
+              "Idle/animations/walk_v2_audited/north-west/frame_003.png",
+              "Idle/animations/walk_v2_audited/north-west/frame_004.png",
+              "Idle/animations/walk_v2_audited/north-west/frame_005.png",
+              "Idle/animations/walk_v2_audited/north-west/frame_006.png"
+            ],
+            "west": [
+              "Idle/animations/walk_v2_audited/west/frame_000.png",
+              "Idle/animations/walk_v2_audited/west/frame_001.png",
+              "Idle/animations/walk_v2_audited/west/frame_002.png",
+              "Idle/animations/walk_v2_audited/west/frame_003.png",
+              "Idle/animations/walk_v2_audited/west/frame_004.png",
+              "Idle/animations/walk_v2_audited/west/frame_005.png",
+              "Idle/animations/walk_v2_audited/west/frame_006.png"
+            ],
+            "north-east": [
+              "Idle/animations/walk_v2_audited/north-east/frame_000.png",
+              "Idle/animations/walk_v2_audited/north-east/frame_001.png",
+              "Idle/animations/walk_v2_audited/north-east/frame_002.png",
+              "Idle/animations/walk_v2_audited/north-east/frame_003.png",
+              "Idle/animations/walk_v2_audited/north-east/frame_004.png",
+              "Idle/animations/walk_v2_audited/north-east/frame_005.png",
+              "Idle/animations/walk_v2_audited/north-east/frame_006.png"
+            ]
+          },
+          "attack_body_v2_clean": {
+            "north": [
+              "Idle/animations/attack_body_v2_clean/north/frame_000.png",
+              "Idle/animations/attack_body_v2_clean/north/frame_001.png",
+              "Idle/animations/attack_body_v2_clean/north/frame_002.png",
+              "Idle/animations/attack_body_v2_clean/north/frame_003.png",
+              "Idle/animations/attack_body_v2_clean/north/frame_004.png",
+              "Idle/animations/attack_body_v2_clean/north/frame_005.png",
+              "Idle/animations/attack_body_v2_clean/north/frame_006.png"
+            ],
+            "north-east": [
+              "Idle/animations/attack_body_v2_clean/north-east/frame_000.png",
+              "Idle/animations/attack_body_v2_clean/north-east/frame_001.png",
+              "Idle/animations/attack_body_v2_clean/north-east/frame_002.png",
+              "Idle/animations/attack_body_v2_clean/north-east/frame_003.png",
+              "Idle/animations/attack_body_v2_clean/north-east/frame_004.png",
+              "Idle/animations/attack_body_v2_clean/north-east/frame_005.png",
+              "Idle/animations/attack_body_v2_clean/north-east/frame_006.png"
+            ],
+            "south": [
+              "Idle/animations/attack_body_v2_clean/south/frame_000.png",
+              "Idle/animations/attack_body_v2_clean/south/frame_001.png",
+              "Idle/animations/attack_body_v2_clean/south/frame_002.png",
+              "Idle/animations/attack_body_v2_clean/south/frame_003.png",
+              "Idle/animations/attack_body_v2_clean/south/frame_004.png",
+              "Idle/animations/attack_body_v2_clean/south/frame_005.png",
+              "Idle/animations/attack_body_v2_clean/south/frame_006.png"
+            ],
+            "south-east": [
+              "Idle/animations/attack_body_v2_clean/south-east/frame_000.png",
+              "Idle/animations/attack_body_v2_clean/south-east/frame_001.png",
+              "Idle/animations/attack_body_v2_clean/south-east/frame_002.png",
+              "Idle/animations/attack_body_v2_clean/south-east/frame_003.png",
+              "Idle/animations/attack_body_v2_clean/south-east/frame_004.png",
+              "Idle/animations/attack_body_v2_clean/south-east/frame_005.png",
+              "Idle/animations/attack_body_v2_clean/south-east/frame_006.png"
+            ],
+            "south-west": [
+              "Idle/animations/attack_body_v2_clean/south-west/frame_000.png",
+              "Idle/animations/attack_body_v2_clean/south-west/frame_001.png",
+              "Idle/animations/attack_body_v2_clean/south-west/frame_002.png",
+              "Idle/animations/attack_body_v2_clean/south-west/frame_003.png",
+              "Idle/animations/attack_body_v2_clean/south-west/frame_004.png",
+              "Idle/animations/attack_body_v2_clean/south-west/frame_005.png",
+              "Idle/animations/attack_body_v2_clean/south-west/frame_006.png"
+            ],
+            "north-west": [
+              "Idle/animations/attack_body_v2_clean/north-west/frame_000.png",
+              "Idle/animations/attack_body_v2_clean/north-west/frame_001.png",
+              "Idle/animations/attack_body_v2_clean/north-west/frame_002.png",
+              "Idle/animations/attack_body_v2_clean/north-west/frame_003.png",
+              "Idle/animations/attack_body_v2_clean/north-west/frame_004.png",
+              "Idle/animations/attack_body_v2_clean/north-west/frame_005.png",
+              "Idle/animations/attack_body_v2_clean/north-west/frame_006.png"
+            ],
+            "west": [
+              "Idle/animations/attack_body_v2_clean/west/frame_000.png",
+              "Idle/animations/attack_body_v2_clean/west/frame_001.png",
+              "Idle/animations/attack_body_v2_clean/west/frame_002.png",
+              "Idle/animations/attack_body_v2_clean/west/frame_003.png",
+              "Idle/animations/attack_body_v2_clean/west/frame_004.png",
+              "Idle/animations/attack_body_v2_clean/west/frame_005.png",
+              "Idle/animations/attack_body_v2_clean/west/frame_006.png"
+            ],
+            "east": [
+              "Idle/animations/attack_body_v2_clean/east/frame_000.png",
+              "Idle/animations/attack_body_v2_clean/east/frame_001.png",
+              "Idle/animations/attack_body_v2_clean/east/frame_002.png",
+              "Idle/animations/attack_body_v2_clean/east/frame_003.png",
+              "Idle/animations/attack_body_v2_clean/east/frame_004.png",
+              "Idle/animations/attack_body_v2_clean/east/frame_005.png",
+              "Idle/animations/attack_body_v2_clean/east/frame_006.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-08-21T11:12:39.215582"
+}

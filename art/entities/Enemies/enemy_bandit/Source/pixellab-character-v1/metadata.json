@@ -1,0 +1,36 @@
+{
+  "group_id": "061fb17e-aa0b-4e1e-87b1-1549f763aecb",
+  "states": [
+    {
+      "character": {
+        "id": "3d587087-edd1-4857-a977-fd061c7e159c",
+        "name": "Idle",
+        "prompt": "Human industrial-district bandit, practical contemporary street clothes, orange-brown jacket over dark layers, compact pistol held clearly in one hand and utility belt, opportunistic criminal not military, readable ranged enemy silhouette, restrained urban-fantasy cyberpunk, full body, transparent background.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "high top-down",
+        "created_at": "2026-08-21T05:10:12.541836+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-08-21T05:15:18.956209"
+}

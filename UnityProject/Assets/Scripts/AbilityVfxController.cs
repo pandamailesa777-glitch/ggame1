@@ -1,0 +1,89 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Nightfall.UnityMvp
+{
+    // Mobile-safe ability VFX: pooled sprites and LineRenderers, no incompatible particle shaders.
+    public sealed class AbilityVfxController : MonoBehaviour
+    {
+        private sealed class SpriteFx { public GameObject go; public SpriteRenderer renderer; public float age,duration,start,end,spin; public Color color; public bool ground; }
+        private sealed class LineFx { public GameObject go; public LineRenderer line; public float age,duration; public Color color; }
+        private static AbilityVfxController instance;
+        private readonly List<SpriteFx> sprites=new List<SpriteFx>(64);
+        private readonly List<LineFx> lines=new List<LineFx>(32);
+        private Sprite sigil,slash,shield;
+        private Camera camera;
+
+        private static AbilityVfxController Get(Camera camera)
+        {
+            if(instance==null){var go=new GameObject("AbilityVfxController");instance=go.AddComponent<AbilityVfxController>();instance.Initialize(camera);}
+            if(camera!=null)instance.camera=camera;return instance;
+        }
+
+        public static void SpawnSigil(Vector3 position,Color color,float radius,int style,Camera camera)
+        {
+            var v=Get(camera);v.EmitSprite(position,color,radius,.78f,true,style==0?85:style==1?-65:130,v.sigil);
+            v.EmitSprite(position+Vector3.up*.04f,Color.Lerp(color,Color.white,.65f),radius*.62f,.58f,true,style==1?110:-100,v.sigil);
+        }
+
+        public static void SpawnShield(Vector3 position,Color color,float radius,Camera camera)
+        {
+            var v=Get(camera);v.EmitSprite(position+Vector3.up*.72f,color,radius,.95f,false,45,v.shield);
+            v.EmitSprite(position+Vector3.up*.72f,Color.white,radius*.72f,.70f,false,-70,v.shield);
+        }
+
+        public static void SpawnWhip(Vector3 from,Vector3 to,Color color,Camera camera)=>Get(camera).EmitJagged(from,to,color,.18f,.34f,5,.20f);
+        public static void SpawnBeam(Vector3 from,Vector3 to,Color color,Camera camera)
+        {
+            var v=Get(camera);v.EmitJagged(from,to,new Color(.12f,.01f,.02f,1),.30f,.42f,1,0);v.EmitJagged(from,to,color,.13f,.36f,1,0);
+        }
+        public static void SpawnLightning(Vector3 from,Vector3 to,Color color,Camera camera)
+        {
+            var v=Get(camera);v.EmitJagged(from,to,Color.white,.09f,.26f,9,.28f);v.EmitJagged(from,to,color,.20f,.34f,8,.34f);
+        }
+        public static void SpawnCrossSlash(Vector3 position,Color color,float radius,Camera camera)
+        {
+            var v=Get(camera);var a=v.EmitSprite(position+Vector3.up*.38f,color,radius,.38f,false,0,v.slash);a.go.transform.Rotate(0,0,42);
+            var b=v.EmitSprite(position+Vector3.up*.38f,Color.white,radius*.88f,.32f,false,0,v.slash);b.go.transform.Rotate(0,0,-48);
+        }
+
+        private void Initialize(Camera target)
+        {
+            camera=target;sigil=CreateSigil();slash=CreateSlash();shield=CreateShield();
+            for(int i=0;i<64;i++){var go=new GameObject("AbilitySprite_"+i);var r=go.AddComponent<SpriteRenderer>();r.sortingOrder=35;go.SetActive(false);sprites.Add(new SpriteFx{go=go,renderer=r});}
+            var shader=Shader.Find("Sprites/Default");
+            for(int i=0;i<32;i++){var go=new GameObject("AbilityLine_"+i);var l=go.AddComponent<LineRenderer>();l.useWorldSpace=true;l.numCapVertices=3;l.numCornerVertices=2;l.sortingOrder=38;if(shader!=null)l.material=new Material(shader);go.SetActive(false);lines.Add(new LineFx{go=go,line=l});}
+        }
+
+        private SpriteFx EmitSprite(Vector3 position,Color color,float radius,float duration,bool ground,float spin,Sprite image)
+        {
+            SpriteFx fx=null;foreach(var f in sprites)if(!f.go.activeSelf){fx=f;break;}if(fx==null)fx=sprites[0];
+            fx.renderer.sprite=image;fx.renderer.color=color;fx.go.transform.position=position;fx.go.transform.rotation=ground?Quaternion.Euler(90,0,0):(camera!=null?camera.transform.rotation:Quaternion.identity);
+            fx.go.transform.localScale=Vector3.one*.15f;fx.age=0;fx.duration=duration;fx.start=.15f;fx.end=radius;fx.spin=spin;fx.color=color;fx.ground=ground;fx.go.SetActive(true);return fx;
+        }
+
+        private void EmitJagged(Vector3 from,Vector3 to,Color color,float width,float duration,int segments,float jitter)
+        {
+            LineFx fx=null;foreach(var f in lines)if(!f.go.activeSelf){fx=f;break;}if(fx==null)fx=lines[0];
+            int count=Mathf.Max(2,segments+1);fx.line.positionCount=count;Vector3 delta=to-from;Vector3 side=Vector3.Cross(Vector3.up,delta.normalized);
+            for(int i=0;i<count;i++){float t=i/(float)(count-1);float noise=(i==0||i==count-1)?0:Random.Range(-jitter,jitter);fx.line.SetPosition(i,Vector3.Lerp(from,to,t)+Vector3.up*(.30f+Mathf.Sin(t*Mathf.PI)*.12f)+side*noise);}
+            fx.line.startWidth=width;fx.line.endWidth=width*.42f;fx.line.startColor=color;fx.line.endColor=new Color(color.r,color.g,color.b,.35f);fx.color=color;fx.age=0;fx.duration=duration;fx.go.SetActive(true);
+        }
+
+        private void Update()
+        {
+            float dt=Time.deltaTime;
+            foreach(var fx in sprites){if(!fx.go.activeSelf)continue;fx.age+=dt;float t=Mathf.Clamp01(fx.age/fx.duration),pop=Mathf.Sin(Mathf.Min(1,t*1.35f)*Mathf.PI*.5f);float scale=Mathf.Lerp(fx.start,fx.end,pop);fx.go.transform.localScale=Vector3.one*scale;fx.go.transform.Rotate(fx.ground?Vector3.forward:Vector3.forward,fx.spin*dt,Space.Self);float alpha=(1-t)*Mathf.Min(1,t*7);fx.renderer.color=new Color(fx.color.r,fx.color.g,fx.color.b,alpha);if(t>=1)fx.go.SetActive(false);}
+            foreach(var fx in lines){if(!fx.go.activeSelf)continue;fx.age+=dt;float t=Mathf.Clamp01(fx.age/fx.duration),a=(1-t)*Mathf.Min(1,t*10);fx.line.startColor=new Color(fx.color.r,fx.color.g,fx.color.b,a);fx.line.endColor=new Color(fx.color.r,fx.color.g,fx.color.b,a*.28f);fx.line.widthMultiplier=1+Mathf.Sin(t*Mathf.PI)*.45f;if(t>=1)fx.go.SetActive(false);}
+        }
+
+        private static Sprite CreateSigil()
+        {
+            const int s=128;var t=new Texture2D(s,s,TextureFormat.RGBA32,false){filterMode=FilterMode.Bilinear,wrapMode=TextureWrapMode.Clamp};var p=new Color[s*s];
+            for(int y=0;y<s;y++)for(int x=0;x<s;x++){float nx=(x+.5f-s*.5f)/(s*.5f),ny=(y+.5f-s*.5f)/(s*.5f),r=Mathf.Sqrt(nx*nx+ny*ny),a=Mathf.Atan2(ny,nx);float rings=Mathf.Max(Band(r,.83f,.035f),Band(r,.55f,.025f));float spokes=Band(Mathf.Abs(Mathf.Sin(a*6)),0,.055f)*Mathf.Clamp01((r-.30f)*8)*Mathf.Clamp01((.78f-r)*8);float diamond=Band(Mathf.Abs(nx)+Mathf.Abs(ny),.36f,.025f);p[y*s+x]=new Color(1,1,1,Mathf.Max(rings,Mathf.Max(spokes,diamond)));}t.SetPixels(p);t.Apply(false,true);return Sprite.Create(t,new Rect(0,0,s,s),new Vector2(.5f,.5f),s);
+        }
+        private static Sprite CreateSlash(){const int s=128;var t=new Texture2D(s,s,TextureFormat.RGBA32,false);var p=new Color[s*s];for(int y=0;y<s;y++)for(int x=0;x<s;x++){float nx=(x+.5f-s*.5f)/(s*.5f),ny=(y+.5f-s*.5f)/(s*.5f);float line=Mathf.Clamp01(1-Mathf.Abs(ny-nx*.12f)/.075f)*Mathf.Clamp01(1-Mathf.Abs(nx));p[y*s+x]=new Color(1,1,1,line);}t.SetPixels(p);t.Apply(false,true);return Sprite.Create(t,new Rect(0,0,s,s),new Vector2(.5f,.5f),s);}
+        private static Sprite CreateShield(){const int s=128;var t=new Texture2D(s,s,TextureFormat.RGBA32,false);var p=new Color[s*s];for(int y=0;y<s;y++)for(int x=0;x<s;x++){float nx=(x+.5f-s*.5f)/(s*.5f),ny=(y+.5f-s*.5f)/(s*.5f),r=Mathf.Sqrt(nx*nx+ny*ny);float rim=Band(r,.76f,.08f),fill=r<.72f?.12f*(1-r/.72f):0;p[y*s+x]=new Color(1,1,1,Mathf.Max(rim,fill));}t.SetPixels(p);t.Apply(false,true);return Sprite.Create(t,new Rect(0,0,s,s),new Vector2(.5f,.5f),s);}
+        private static float Band(float value,float center,float width)=>Mathf.Clamp01(1-Mathf.Abs(value-center)/width);
+    }
+}

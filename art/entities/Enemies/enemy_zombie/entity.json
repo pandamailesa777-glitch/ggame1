@@ -1,0 +1,20 @@
+{
+  "id": "enemy_zombie",
+  "displayName": "Industrial Outskirts Zombie",
+  "entityType": "enemy",
+  "description": "a slow infected civilian forming dense crowds, worn contemporary work clothes, desaturated sick skin, restrained dark-magical veins, no weapons",
+  "directions": 8,
+  "scale": 1.0,
+  "pivotX": 0.5,
+  "pivotY": 0.9,
+  "sortOffset": 0,
+  "fallbackColor": "#718056",
+  "visualNotes": "Uneven hunched posture, heavy dragging gait, industrial-worker clothing variations in charcoal, faded olive and dirty beige.",
+  "gameplayReadability": "Slower and visually heavier than vampires; broad blocking silhouette, low VFX, clearly melee-only.",
+  "animations": [
+    { "id": "move", "frames": 6, "fps": 7, "loop": true },
+    { "id": "attack", "frames": 5, "fps": 10, "loop": false },
+    { "id": "hit", "frames": 3, "fps": 12, "loop": false },
+    { "id": "death", "frames": 7, "fps": 9, "loop": false }
+  ]
+}

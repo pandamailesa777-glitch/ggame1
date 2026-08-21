@@ -1,0 +1,36 @@
+{
+  "group_id": "45f91213-4aed-46b1-8096-956607e351a2",
+  "states": [
+    {
+      "character": {
+        "id": "fe2b01fe-c2a8-4cb6-86fd-8f3f39d95df8",
+        "name": "Idle",
+        "prompt": "Zike, canonical silver-haired cat furion lightning swordsman, green eyes, black modern combat coat with fur collar, katana held visibly, silver cat ears and tail, restrained blue lightning accents, compact readable mobile survivors-like full-body sprite. Preserve the supplied sprite identity, outfit, weapon, palette and proportions. Clean transparent edges, no extra fragments, no background.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "high top-down",
+        "created_at": "2026-08-21T05:31:14.976670+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-08-21T05:38:02.669306"
+}

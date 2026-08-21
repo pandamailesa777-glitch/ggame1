@@ -1,0 +1,36 @@
+{
+  "group_id": "f677e14f-8aae-474a-8d95-96829bde19ff",
+  "states": [
+    {
+      "character": {
+        "id": "2cc57632-f4cb-4e96-a41c-bc519f247678",
+        "name": "Idle",
+        "prompt": "Fast urban vampire melee hunter, lean predatory humanoid silhouette, modern charcoal street coat with dark burgundy lining, pale skin, subtle red eyes, clawed hands, no weapon, no cape, restrained urban-fantasy cyberpunk, readable mobile survivors-like enemy, full body, transparent background.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "high top-down",
+        "created_at": "2026-08-21T05:10:12.797866+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-08-21T05:15:17.694938"
+}
