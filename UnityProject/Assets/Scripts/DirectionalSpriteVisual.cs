@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Nightfall.UnityMvp
 {
+    [RequireComponent(typeof(SpriteRenderer))]
     public sealed class DirectionalSpriteVisual : MonoBehaviour
     {
         private sealed class Clip { public Sprite[,] frames; public int frameCount; public float fps; public bool loop; }
@@ -21,7 +22,7 @@ namespace Nightfall.UnityMvp
         private Vector3 baseScale = Vector3.one;
         private float proceduralTimer;
         private string proceduralAction;
-        private bool moving=true;
+        private bool moving=true,proceduralLocomotion;
         // Packed rows: E, SE, S, SW, W, NW, N, NE.
         // Runtime angles: E, NE, N, NW, W, SW, S, SE.
         private static readonly int[] PackedRowsForRuntime={0,7,6,5,4,3,2,1};
@@ -119,23 +120,33 @@ namespace Nightfall.UnityMvp
             facing = new Vector2(worldDirection.x, worldDirection.z).normalized;
         }
         public void SetMoving(bool value){moving=value;}
+        public void SetProceduralLocomotion(bool value){proceduralLocomotion=value;}
 
         private void LateUpdate()
         {
             if (frames == null) return;
+            if(spriteRenderer==null)spriteRenderer=gameObject.GetComponent<SpriteRenderer>() ?? gameObject.AddComponent<SpriteRenderer>();
             clock += Time.deltaTime;
             if(clips.TryGetValue(activeClip,out var clip)){frames=clip.frames;frameCount=clip.frameCount;fps=clip.fps;if(!clip.loop&&clock*fps>=frameCount){activeClip=fallbackClip;clock=0;clip=clips[activeClip];frames=clip.frames;frameCount=clip.frameCount;fps=clip.fps;}}
             float angle = Mathf.Atan2(facing.y, facing.x) * Mathf.Rad2Deg;
             int direction = Mathf.RoundToInt(angle / (360f / directions));
             direction = (direction % directions + directions) % directions;
             bool proceduralAttack=proceduralTimer>0&&(proceduralAction=="attack"||proceduralAction=="cast");
-            int frame = frameCount <= 1||(activeClip=="move"&&!moving&&!proceduralAttack) ? 0 : proceduralAttack?Mathf.Min(frameCount-1,Mathf.FloorToInt((1-proceduralTimer/.28f)*frameCount)):Mathf.FloorToInt(clock * fps) % frameCount;
+            // A procedural attack must never advance the movement strip. The previous
+            // branch deliberately walked through it, so the supposedly fixed body still
+            // appeared to spin/bob like a carousel while the weapon attacked.
+            int frame = frameCount <= 1||proceduralAttack||(activeClip=="move"&&(!moving||proceduralLocomotion))
+                ? 0
+                : Mathf.FloorToInt(clock * fps) % frameCount;
             spriteRenderer.sprite = frames[direction, frame];
             spriteRenderer.flipX = flipDirections != null && flipDirections[direction];
-            float tilt=0,scalePulse=1;
-            if(proceduralTimer>0){proceduralTimer=Mathf.Max(0,proceduralTimer-Time.deltaTime);float t=proceduralTimer/.28f;if(proceduralAction=="attack"||proceduralAction=="cast"){tilt=Mathf.Sin(t*Mathf.PI)*-9;scalePulse=1+Mathf.Sin(t*Mathf.PI)*.1f;}else if(proceduralAction=="hit"){tilt=Mathf.Sin(t*Mathf.PI)*12;scalePulse=.9f;}else if(proceduralAction=="dash")scalePulse=1+Mathf.Sin(t*Mathf.PI)*.16f;}
+            float tilt=0,scalePulse=1,walkStretch=1;
+            // Single-frame directional art should still read as grounded locomotion.
+            // A subtle alternating step avoids both static gliding and fake frame rotation.
+            if(moving&&activeClip=="move"&&(frameCount<=1||proceduralLocomotion)){float step=Mathf.Sin(clock*10.5f);tilt=step*2.2f;walkStretch=1+Mathf.Abs(step)*.035f;}
+            if(proceduralTimer>0){proceduralTimer=Mathf.Max(0,proceduralTimer-Time.deltaTime);float t=proceduralTimer/.28f;if(proceduralAction=="attack"||proceduralAction=="cast"){tilt=0;scalePulse=1;}else if(proceduralAction=="hit"){tilt=Mathf.Sin(t*Mathf.PI)*12;scalePulse=.9f;}else if(proceduralAction=="dash")scalePulse=1+Mathf.Sin(t*Mathf.PI)*.16f;}
             if (targetCamera != null) transform.rotation = targetCamera.transform.rotation*Quaternion.Euler(0,0,tilt);
-            transform.localScale = baseScale*scalePulse;
+            transform.localScale = new Vector3(baseScale.x/Mathf.Sqrt(walkStretch),baseScale.y*walkStretch,baseScale.z)*scalePulse;
         }
     }
 }

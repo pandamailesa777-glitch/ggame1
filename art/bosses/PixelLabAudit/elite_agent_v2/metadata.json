@@ -1,0 +1,36 @@
+{
+  "group_id": "bfec0cc7-7279-4924-92cd-7b23e9219ecc",
+  "states": [
+    {
+      "character": {
+        "id": "5a7941a5-57f2-47ce-992d-809b2e92cd76",
+        "name": "Idle",
+        "prompt": "Elite human bureau field agent boss for a dark modern supernatural survival game. Adult human woman, clearly human face and anatomy, fitted black tactical trench coat over dark business suit, white shirt, narrow red tie, leather gloves, compact conventional handgun in a low ready pose, subtle gold bureau badge. Grounded contemporary occult-investigation aesthetic, intimidating senior operative, no helmet, no mask, no powered armor, no sci-fi exosuit, no robot parts, no neon, no oversized gun. Full body readable pixel sprite.",
+        "size": {
+          "width": 136,
+          "height": 136
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-08-24T05:24:57.513347+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-08-24T06:15:02.531535"
+}

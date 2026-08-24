@@ -1,12 +1,15 @@
 .gradle/
 .android-sdk/
 .android-avd/
+.android-build-workspace/
 build/
 app/build/
 local.properties
 *.iml
 *.log
 test-artifacts/
+__pycache__/
+*.py[cod]
 .env
 .env.*
 !.env.example

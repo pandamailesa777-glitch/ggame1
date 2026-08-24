@@ -1,0 +1,111 @@
+{
+  "group_id": "f677e14f-8aae-474a-8d95-96829bde19ff",
+  "states": [
+    {
+      "character": {
+        "id": "2cc57632-f4cb-4e96-a41c-bc519f247678",
+        "name": "Idle",
+        "prompt": "Fast urban vampire melee hunter, lean predatory humanoid silhouette, modern charcoal street coat with dark burgundy lining, pale skin, subtle red eyes, clawed hands, no weapon, no cape, restrained urban-fantasy cyberpunk, readable mobile survivors-like enemy, full body, transparent background.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "high top-down",
+        "created_at": "2026-08-21T05:10:12.797866+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "walk_v3_rootlocked": {
+            "west": [
+              "Idle/animations/walk_v3_rootlocked/west/frame_000.png",
+              "Idle/animations/walk_v3_rootlocked/west/frame_001.png",
+              "Idle/animations/walk_v3_rootlocked/west/frame_002.png",
+              "Idle/animations/walk_v3_rootlocked/west/frame_003.png",
+              "Idle/animations/walk_v3_rootlocked/west/frame_004.png",
+              "Idle/animations/walk_v3_rootlocked/west/frame_005.png",
+              "Idle/animations/walk_v3_rootlocked/west/frame_006.png"
+            ],
+            "north-west": [
+              "Idle/animations/walk_v3_rootlocked/north-west/frame_000.png",
+              "Idle/animations/walk_v3_rootlocked/north-west/frame_001.png",
+              "Idle/animations/walk_v3_rootlocked/north-west/frame_002.png",
+              "Idle/animations/walk_v3_rootlocked/north-west/frame_003.png",
+              "Idle/animations/walk_v3_rootlocked/north-west/frame_004.png",
+              "Idle/animations/walk_v3_rootlocked/north-west/frame_005.png",
+              "Idle/animations/walk_v3_rootlocked/north-west/frame_006.png"
+            ],
+            "north-east": [
+              "Idle/animations/walk_v3_rootlocked/north-east/frame_000.png",
+              "Idle/animations/walk_v3_rootlocked/north-east/frame_001.png",
+              "Idle/animations/walk_v3_rootlocked/north-east/frame_002.png",
+              "Idle/animations/walk_v3_rootlocked/north-east/frame_003.png",
+              "Idle/animations/walk_v3_rootlocked/north-east/frame_004.png",
+              "Idle/animations/walk_v3_rootlocked/north-east/frame_005.png",
+              "Idle/animations/walk_v3_rootlocked/north-east/frame_006.png"
+            ],
+            "south-west": [
+              "Idle/animations/walk_v3_rootlocked/south-west/frame_000.png",
+              "Idle/animations/walk_v3_rootlocked/south-west/frame_001.png",
+              "Idle/animations/walk_v3_rootlocked/south-west/frame_002.png",
+              "Idle/animations/walk_v3_rootlocked/south-west/frame_003.png",
+              "Idle/animations/walk_v3_rootlocked/south-west/frame_004.png",
+              "Idle/animations/walk_v3_rootlocked/south-west/frame_005.png",
+              "Idle/animations/walk_v3_rootlocked/south-west/frame_006.png"
+            ],
+            "south": [
+              "Idle/animations/walk_v3_rootlocked/south/frame_000.png",
+              "Idle/animations/walk_v3_rootlocked/south/frame_001.png",
+              "Idle/animations/walk_v3_rootlocked/south/frame_002.png",
+              "Idle/animations/walk_v3_rootlocked/south/frame_003.png",
+              "Idle/animations/walk_v3_rootlocked/south/frame_004.png",
+              "Idle/animations/walk_v3_rootlocked/south/frame_005.png",
+              "Idle/animations/walk_v3_rootlocked/south/frame_006.png"
+            ],
+            "south-east": [
+              "Idle/animations/walk_v3_rootlocked/south-east/frame_000.png",
+              "Idle/animations/walk_v3_rootlocked/south-east/frame_001.png",
+              "Idle/animations/walk_v3_rootlocked/south-east/frame_002.png",
+              "Idle/animations/walk_v3_rootlocked/south-east/frame_003.png",
+              "Idle/animations/walk_v3_rootlocked/south-east/frame_004.png",
+              "Idle/animations/walk_v3_rootlocked/south-east/frame_005.png",
+              "Idle/animations/walk_v3_rootlocked/south-east/frame_006.png"
+            ],
+            "north": [
+              "Idle/animations/walk_v3_rootlocked/north/frame_000.png",
+              "Idle/animations/walk_v3_rootlocked/north/frame_001.png",
+              "Idle/animations/walk_v3_rootlocked/north/frame_002.png",
+              "Idle/animations/walk_v3_rootlocked/north/frame_003.png",
+              "Idle/animations/walk_v3_rootlocked/north/frame_004.png",
+              "Idle/animations/walk_v3_rootlocked/north/frame_005.png",
+              "Idle/animations/walk_v3_rootlocked/north/frame_006.png"
+            ],
+            "east": [
+              "Idle/animations/walk_v3_rootlocked/east/frame_000.png",
+              "Idle/animations/walk_v3_rootlocked/east/frame_001.png",
+              "Idle/animations/walk_v3_rootlocked/east/frame_002.png",
+              "Idle/animations/walk_v3_rootlocked/east/frame_003.png",
+              "Idle/animations/walk_v3_rootlocked/east/frame_004.png",
+              "Idle/animations/walk_v3_rootlocked/east/frame_005.png",
+              "Idle/animations/walk_v3_rootlocked/east/frame_006.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-08-24T06:45:35.562968"
+}

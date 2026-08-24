@@ -17,12 +17,16 @@ namespace Nightfall.UnityMvp
         {
             this.camera = camera;
             // Equal apparent height; the shared 1.30 width multiplier is an intentional art-direction choice.
-            Register("hero_amelia","Art/Generated/hero_amelia_canonical__move__8dir__7fps__loop",6,8,-1,7,72,1.48f,new Color(1,.9f,.65f),1.30f);
-            Register("hero_sam","Art/Generated/hero_sam_canonical__move__8dir__7fps__loop",6,8,-1,7,72,1.50f,new Color(.55f,.08f,.18f),1.30f);
-            Register("hero_zike","Art/Generated/hero_zike_canonical__move__8dir__7fps__loop",6,8,-1,7,72,1.74f,new Color(.2f,.75f,1),1.30f);
+            Register("hero_amelia","Art/Generated/hero_amelia_canonical__move__8dir__7fps__loop",6,8,-1,7,72,1.48f,new Color(1,.9f,.65f),1.38f);
+            Register("hero_sam","Art/Generated/hero_sam_canonical__move__8dir__7fps__loop",6,8,-1,7,72,1.50f,new Color(.55f,.08f,.18f),1.38f);
+            Register("hero_zike","Art/Generated/hero_zike_canonical__move__8dir__7fps__loop",6,8,-1,7,72,1.74f,new Color(.2f,.75f,1),1.38f);
             Register("enemy_zombie", "Art/enemy_zombie_move_8dir", 6, 8, -1, 7, 72, 1, new Color(.35f,.48f,.3f));
+            Register("enemy_drone", "Art/Generated/enemy_drone_idle", 1, 1, -1, 1, 96, .72f, new Color(.42f,.82f,.92f));
+            Register("boss_assassin", "Art/Bosses/boss_assassin__idle__8dir__1fps__loop", 1, 8, -1, 1, 72, 1.1f, new Color(.08f,.08f,.1f));
+            Register("boss_elite_agent", "Art/Bosses/boss_elite_agent__idle__8dir__1fps__loop", 1, 8, -1, 1, 96, 1.35f, new Color(.15f,.36f,.48f));
+            Register("boss_mech", "Art/Bosses/boss_mech__idle__8dir__1fps__loop", 1, 8, -1, 1, 72, 2.15f, new Color(.43f,.48f,.52f));
             foreach (var e in GameCatalog.Enemies) if (!definitions.ContainsKey(e.spriteId)) RegisterFallback(e.spriteId,e.fallback,e.scale);
-            foreach (var b in GameCatalog.Bosses) RegisterFallback(b.spriteId,b.fallback,b.scale);
+            foreach (var b in GameCatalog.Bosses) if (!definitions.ContainsKey(b.spriteId)) RegisterFallback(b.spriteId,b.fallback,b.scale);
         }
 
         private void Register(string id,string resource,int columns,int rows,int entityRow,float fps,float ppu,float scale,Color fallback,float width=1f)
@@ -44,7 +48,10 @@ namespace Nightfall.UnityMvp
             }
             if(texture==null&&d.entityRow<0)
             {
-                string generated="Art/Generated/"+id+"_move_8dir";texture=Resources.Load<Texture2D>(generated);
+                // These two PixelLab walk exports rotate the whole character between frames in motion.
+                // Keep the source sheets for audit, but do not bind them in gameplay.
+                string generated="Art/Generated/"+id+"_move_8dir";
+                if(id!="enemy_vampire"&&id!="enemy_bandit")texture=Resources.Load<Texture2D>(generated);
                 if(texture==null){generated="Art/Generated/"+id+"_idle_8dir";texture=Resources.Load<Texture2D>(generated);}
                 if(texture!=null){d.columns=Mathf.Max(1,texture.width/(texture.height/8));d.rows=8;d.fps=d.columns>1?7:1;d.ppu=72;}
             }
@@ -58,12 +65,21 @@ namespace Nightfall.UnityMvp
 
         private void AddOptionalClips(DirectionalSpriteVisual visual,string id,float ppu)
         {
-            AddOptionalClip(visual,id,"attack",14,ppu,false);AddOptionalClip(visual,id,"hit",12,ppu,false);AddOptionalClip(visual,id,"death",9,ppu,false);
+            // Heroes use a deliberately tiny two-pose strip: neutral -> raised attacking
+            // hand. It must never fall back to the old multi-frame attack exports, which
+            // rotated/deformed the whole body and produced the carousel effect.
+            if(id.StartsWith("hero_"))AddOptionalClipResource(visual,"attack","Art/Generated/"+id+"_attack_pose_8dir",7,ppu,false);
+            else AddOptionalClip(visual,id,"attack",12,ppu,false);
+            AddOptionalClip(visual,id,"hit",12,ppu,false);AddOptionalClip(visual,id,"death",9,ppu,false);
             AddOptionalClip(visual,id,"cast",10,ppu,false);AddOptionalClip(visual,id,"dash",14,ppu,false);
         }
         private void AddOptionalClip(DirectionalSpriteVisual visual,string id,string clip,float fps,float ppu,bool loop)
         {
-            string resource="Art/Generated/"+id+"_"+clip+"_8dir";if(!textures.TryGetValue(resource,out var texture)){texture=Resources.Load<Texture2D>(resource);textures[resource]=texture;}
+            AddOptionalClipResource(visual,clip,"Art/Generated/"+id+"_"+clip+"_8dir",fps,ppu,loop);
+        }
+        private void AddOptionalClipResource(DirectionalSpriteVisual visual,string clip,string resource,float fps,float ppu,bool loop)
+        {
+            if(!textures.TryGetValue(resource,out var texture)){texture=Resources.Load<Texture2D>(resource);textures[resource]=texture;}
             if(texture==null)return;int rows=8,cell=texture.height/rows,columns=Mathf.Max(1,texture.width/cell);visual.AddClip(clip,texture,columns,rows,fps,ppu,loop);
         }
 

@@ -11,7 +11,7 @@ namespace Nightfall.UnityMvp.Editor
     {
         public static void Build()
         {
-            BuildInternal("Builds/Android/NightfallUnity.apk", ScriptingImplementation.IL2CPP, AndroidArchitecture.ARM64);
+            BuildInternal("Builds/Android/BureauBreakers-Chapter1-beta-0.3.0.apk", ScriptingImplementation.IL2CPP, AndroidArchitecture.ARM64);
         }
 
         private static void BuildInternal(string output, ScriptingImplementation backend, AndroidArchitecture architectures)
@@ -21,8 +21,9 @@ namespace Nightfall.UnityMvp.Editor
                 !EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android))
                 throw new BuildFailedException("Could not switch active build target to Android.");
             PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.nightfall.protocol.unity");
-            PlayerSettings.bundleVersion = "0.2.0";
-            PlayerSettings.Android.bundleVersionCode = 2;
+            PlayerSettings.productName = "Bureau breakers: Chapter 1";
+            PlayerSettings.bundleVersion = "0.3.0-beta.1";
+            PlayerSettings.Android.bundleVersionCode = 3;
             PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
             PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevelAuto;
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, backend);

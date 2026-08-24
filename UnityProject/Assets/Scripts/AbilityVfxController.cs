@@ -47,6 +47,23 @@ namespace Nightfall.UnityMvp
             var b=v.EmitSprite(position+Vector3.up*.38f,Color.white,radius*.88f,.32f,false,0,v.slash);b.go.transform.Rotate(0,0,-48);
         }
 
+        public static void SpawnRuneBloom(Vector3 position,Color color,float radius,Camera camera)
+        {
+            var v=Get(camera);v.EmitSprite(position,color,radius*.72f,.72f,true,95,v.sigil);
+            for(int i=0;i<6;i++){float a=i*Mathf.PI/3;Vector3 p=position+new Vector3(Mathf.Cos(a),.08f,Mathf.Sin(a))*radius*.62f;v.EmitSprite(p,Color.Lerp(color,Color.white,.35f),radius*.28f,.52f,true,i%2==0?150:-150,v.sigil);}
+        }
+
+        public static void SpawnBladeWheel(Vector3 position,Color color,float radius,Camera camera)
+        {
+            var v=Get(camera);for(int i=0;i<6;i++){float a=i*Mathf.PI/3;Vector3 p=position+new Vector3(Mathf.Cos(a),.38f,Mathf.Sin(a))*radius*.42f;var fx=v.EmitSprite(p,i%2==0?color:Color.Lerp(color,Color.white,.55f),radius*.72f,.46f,false,i%2==0?210:-210,v.slash);fx.go.transform.Rotate(0,0,-a*Mathf.Rad2Deg);}
+        }
+
+        public static void SpawnImpactBurst(Vector3 position,Color color,float radius,Camera camera)
+        {
+            var v=Get(camera);v.EmitSprite(position+Vector3.up*.45f,color,radius,.42f,false,180,v.shield);
+            for(int i=0;i<4;i++){var fx=v.EmitSprite(position+Vector3.up*.38f,i%2==0?Color.white:color,radius*(1-i*.08f),.34f,false,i%2==0?80:-80,v.slash);fx.go.transform.Rotate(0,0,i*45);}
+        }
+
         private void Initialize(Camera target)
         {
             camera=target;sigil=CreateSigil();slash=CreateSlash();shield=CreateShield();

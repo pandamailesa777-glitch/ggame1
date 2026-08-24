@@ -6,9 +6,15 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "art" / "heroes" / "Approved" / "v2"
+ATTACK_V3 = ROOT / "art" / "heroes" / "AttackV3Audit" / "amelia_rootlocked_8dir"
 DESTINATION = ROOT / "UnityProject" / "Assets" / "Resources" / "Art" / "Generated"
 DIRECTIONS = ("east", "south-east", "south", "south-west", "west", "north-west", "north", "north-east")
 TARGET = 128
+# Every direction and every frame must share the same gameplay root.  The old
+# packer stabilized a direction against its own idle frame, which left eight
+# different roots and made direction changes look like an orbit around the
+# character transform.
+SHARED_ROOT = (TARGET // 2, TARGET - 11)
 
 
 def source_for(hero: str, direction: str) -> Path:
@@ -50,10 +56,14 @@ def remove_detached_yellow_specks(image: Image.Image) -> Image.Image:
 def padded_frame(path: Path) -> Image.Image:
     image = remove_detached_yellow_specks(Image.open(path).convert("RGBA"))
     if image.width > TARGET or image.height > TARGET:
-        raise ValueError(
-            f"source frame exceeds {TARGET}x{TARGET} and would be clipped: "
-            f"{path} is {image.width}x{image.height}"
-        )
+        content = image.getchannel("A").getbbox()
+        if content is not None and content[2] - content[0] <= TARGET and content[3] - content[1] <= TARGET:
+            image = image.crop(content)
+        else:
+            raise ValueError(
+                f"source frame exceeds {TARGET}x{TARGET} and would be clipped: "
+                f"{path} is {image.width}x{image.height}"
+            )
     packed = Image.new("RGBA", (TARGET, TARGET), (0, 0, 0, 0))
     packed.alpha_composite(image, ((TARGET - image.width) // 2, (TARGET - image.height) // 2))
     return packed
@@ -84,13 +94,13 @@ def stabilize(image: Image.Image, reference: tuple[float, int]) -> Image.Image:
 
 def main():
     for hero in ("amelia", "sam", "zike"):
-        sheet = Image.new("RGBA", (TARGET * 6, TARGET * 8), (0, 0, 0, 0))
+        frame_indices = range(5) if hero == "amelia" else range(1, 7)
+        sheet = Image.new("RGBA", (TARGET * len(frame_indices), TARGET * 8), (0, 0, 0, 0))
         for row, direction in enumerate(DIRECTIONS):
-            source = source_for(hero, direction)
-            reference = root_anchor(padded_frame(source / direction / "frame_000.png"))
-            for column, frame_index in enumerate(range(1, 7)):
-                path = source / direction / f"frame_{frame_index:03d}.png"
-                packed = stabilize(padded_frame(path), reference)
+            source = ATTACK_V3 if hero == "amelia" else source_for(hero, direction)
+            for column, frame_index in enumerate(frame_indices):
+                path = source / direction / f"{frame_index}.png" if hero == "amelia" else source / direction / f"frame_{frame_index:03d}.png"
+                packed = stabilize(padded_frame(path), SHARED_ROOT)
                 sheet.alpha_composite(packed, (column * TARGET, row * TARGET))
         output = DESTINATION / f"hero_{hero}_attack_8dir.png"
         sheet.save(output)
