@@ -38,7 +38,11 @@ namespace Nightfall.UnityMvp
         }
         public void PlayAttack(Vector3 direction,Action onHit)
         {
-            if(direction.sqrMagnitude>.001f){facing=new Vector2(direction.x,direction.z).normalized;body.SetFacing(direction);}attackClock=profile.attackDuration;hitSent=false;hitEvent=onHit;body.Play("attack",true);
+            if(direction.sqrMagnitude>.001f){facing=new Vector2(direction.x,direction.z).normalized;body.SetFacing(direction);}attackClock=profile.attackDuration;hitSent=false;hitEvent=onHit;body.TriggerAttackBob();
+            // Amelia keeps her current locomotion pose. Her generated body attack frame
+            // subtly changes proportions and reads as stretching; only the whip/VFX move.
+            if(profile.hero==HeroKind.Amelia)body.SuppressBodyAnimation(true);
+            else body.Play("attack",true);
         }
         public void PlayCast(){body.Play("cast",true);}
         public Vector3 AttackOrigin()
@@ -62,7 +66,7 @@ namespace Nightfall.UnityMvp
         private void LateUpdate()
         {
             if(profile==null||weapon==null)return;float phase=attackClock>0?1-attackClock/profile.attackDuration:0;
-            if(attackClock>0){attackClock=Mathf.Max(0,attackClock-Time.deltaTime);if(!hitSent&&phase>=profile.hitTime){hitSent=true;var callback=hitEvent;hitEvent=null;callback?.Invoke();}}
+            if(attackClock>0){attackClock=Mathf.Max(0,attackClock-Time.deltaTime);if(!hitSent&&phase>=profile.hitTime){hitSent=true;var callback=hitEvent;hitEvent=null;callback?.Invoke();}if(attackClock<=0&&profile.hero==HeroKind.Amelia)body.SuppressBodyAnimation(false);}
             ApplyPose(phase);
         }
         private void ApplyPose(float phase)

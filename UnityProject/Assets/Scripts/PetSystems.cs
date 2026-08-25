@@ -15,6 +15,8 @@ namespace Nightfall.UnityMvp
 
     public static class PetCatalog
     {
+        public const int MaxLevel=5;
+        public const float DamageBonusPerLevel=.25f;
         private static readonly PetDefinition[] Definitions={
             new PetDefinition{id="amelia_cat",displayName="ЛЮМЕН",ownerCharacterId="hero_amelia",description="Белый кот-фамильяр Амелии. Атакует врагов и повторяет её заклинания.",spriteResource="Art/Pets/AmeliaCat/pet_amelia_cat",portraitResource="Art/Pets/AmeliaCat/pet_amelia_cat_portrait"},
             new PetDefinition{id="sam_wolf_cub",displayName="ФЕНРИ",ownerCharacterId="hero_sam",description="Маленький волчонок Сэма. Держится рядом и усиливает натиск хозяина.",spriteResource="Art/Pets/SamWolfCub/pet_sam_wolf_cub",portraitResource="Art/Pets/SamWolfCub/pet_sam_wolf_cub_portrait"},
@@ -30,11 +32,11 @@ namespace Nightfall.UnityMvp
 
     public static class LootDropTable
     {
-        public const float TreatChance=.15f;
-        public static bool Roll(LootKind kind,bool enabled)
+        public const float TreatChanceBeforeSummon=.15f,TreatChanceAfterSummon=.055f;
+        public static bool Roll(LootKind kind,bool enabled,bool petUnlocked=false)
         {
             if(!enabled)return false;
-            return kind==LootKind.Treat&&UnityEngine.Random.value<TreatChance;
+            return kind==LootKind.Treat&&UnityEngine.Random.value<(petUnlocked?TreatChanceAfterSummon:TreatChanceBeforeSummon);
         }
     }
 

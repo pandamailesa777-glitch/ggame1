@@ -20,9 +20,9 @@ namespace Nightfall.UnityMvp
         private Camera targetCamera;
         private bool[] flipDirections;
         private Vector3 baseScale = Vector3.one;
-        private float proceduralTimer;
+        private float proceduralTimer,attackBobTimer;
         private string proceduralAction;
-        private bool moving=true,proceduralLocomotion;
+        private bool moving=true,proceduralLocomotion,suppressBodyAnimation;
         // Packed rows: E, SE, S, SW, W, NW, N, NE.
         // Runtime angles: E, NE, N, NW, W, SW, S, SE.
         private static readonly int[] PackedRowsForRuntime={0,7,6,5,4,3,2,1};
@@ -121,6 +121,18 @@ namespace Nightfall.UnityMvp
         }
         public void SetMoving(bool value){moving=value;}
         public void SetProceduralLocomotion(bool value){proceduralLocomotion=value;}
+        public void TriggerAttackBob(){attackBobTimer=.24f;}
+        public void SuppressBodyAnimation(bool value)
+        {
+            suppressBodyAnimation=value;
+            if(value)
+            {
+                activeClip=fallbackClip;
+                clock=0;
+                proceduralTimer=0;
+                transform.localScale=baseScale;
+            }
+        }
 
         private void LateUpdate()
         {
@@ -135,7 +147,7 @@ namespace Nightfall.UnityMvp
             // A procedural attack must never advance the movement strip. The previous
             // branch deliberately walked through it, so the supposedly fixed body still
             // appeared to spin/bob like a carousel while the weapon attacked.
-            int frame = frameCount <= 1||proceduralAttack||(activeClip=="move"&&(!moving||proceduralLocomotion))
+            int frame = suppressBodyAnimation||frameCount <= 1||proceduralAttack||(activeClip=="move"&&(!moving||proceduralLocomotion))
                 ? 0
                 : Mathf.FloorToInt(clock * fps) % frameCount;
             spriteRenderer.sprite = frames[direction, frame];
@@ -145,8 +157,10 @@ namespace Nightfall.UnityMvp
             // A subtle alternating step avoids both static gliding and fake frame rotation.
             if(moving&&activeClip=="move"&&(frameCount<=1||proceduralLocomotion)){float step=Mathf.Sin(clock*10.5f);tilt=step*2.2f;walkStretch=1+Mathf.Abs(step)*.035f;}
             if(proceduralTimer>0){proceduralTimer=Mathf.Max(0,proceduralTimer-Time.deltaTime);float t=proceduralTimer/.28f;if(proceduralAction=="attack"||proceduralAction=="cast"){tilt=0;scalePulse=1;}else if(proceduralAction=="hit"){tilt=Mathf.Sin(t*Mathf.PI)*12;scalePulse=.9f;}else if(proceduralAction=="dash")scalePulse=1+Mathf.Sin(t*Mathf.PI)*.16f;}
+            if(suppressBodyAnimation){tilt=0;walkStretch=1;scalePulse=1;}
+            if(attackBobTimer>0){attackBobTimer=Mathf.Max(0,attackBobTimer-Time.deltaTime);float progress=1-attackBobTimer/.24f;float side=Mathf.Abs(facing.x)>.08f?Mathf.Sign(facing.x):1;tilt+=side*(Mathf.Sin(progress*Mathf.PI)*3.8f+Mathf.Sin(progress*Mathf.PI*2)*1.15f);}
             if (targetCamera != null) transform.rotation = targetCamera.transform.rotation*Quaternion.Euler(0,0,tilt);
-            transform.localScale = new Vector3(baseScale.x/Mathf.Sqrt(walkStretch),baseScale.y*walkStretch,baseScale.z)*scalePulse;
+            transform.localScale = suppressBodyAnimation?baseScale:new Vector3(baseScale.x/Mathf.Sqrt(walkStretch),baseScale.y*walkStretch,baseScale.z)*scalePulse;
         }
     }
 }

@@ -64,6 +64,45 @@ namespace Nightfall.UnityMvp
             for(int i=0;i<4;i++){var fx=v.EmitSprite(position+Vector3.up*.38f,i%2==0?Color.white:color,radius*(1-i*.08f),.34f,false,i%2==0?80:-80,v.slash);fx.go.transform.Rotate(0,0,i*45);}
         }
 
+        public static void SpawnCastFlash(Vector3 position,Color color,float radius,Camera camera)
+        {var v=Get(camera);v.EmitSprite(position+Vector3.up*.48f,Color.Lerp(color,Color.white,.55f),radius,.22f,false,110,v.shield);}
+
+        public static void SpawnProjectileImpact(Vector3 position,Color color,int style,float radius,Camera camera)
+        {var v=Get(camera);if(style==2){for(int i=0;i<3;i++){float a=i*Mathf.PI*2/3;v.EmitJagged(position,position+new Vector3(Mathf.Cos(a),0,Mathf.Sin(a))*radius,color,.055f,.18f,3,.08f);}}else{var fx=v.EmitSprite(position+Vector3.up*.28f,style==1?Color.Lerp(color,Color.black,.25f):Color.Lerp(color,Color.white,.55f),radius,.22f,false,style==1?-220:180,v.slash);fx.go.transform.Rotate(0,0,style==1?35:0);}}
+
+        public static void SpawnHealingRise(Vector3 position,Color color,float radius,Camera camera)
+        {var v=Get(camera);for(int i=0;i<5;i++){float a=i*Mathf.PI*2/5;Vector3 p=position+new Vector3(Mathf.Cos(a),.18f,Mathf.Sin(a))*radius*.34f;v.EmitJagged(p,p+Vector3.up*(.65f+radius*.16f),color,.045f,.62f,2,.03f);}}
+
+        public static void SpawnArrowVolleyCue(Vector3 position,Vector3 forward,Color color,int count,Camera camera)
+        {var v=Get(camera);Vector3 side=Vector3.Cross(Vector3.up,forward.normalized);int marks=Mathf.Clamp(count,3,7);for(int i=0;i<marks;i++){float t=marks==1?0:i/(float)(marks-1)-.5f;Vector3 p=position+side*t*1.15f+Vector3.up*.35f;v.EmitJagged(p,p+forward.normalized*.72f,Color.Lerp(color,Color.white,.45f),.045f,.2f,1,0);}}
+
+        public static void SpawnStaffSweep(Vector3 position,Color color,float radius,Camera camera)
+        {var v=Get(camera);var fx=v.EmitSprite(position+Vector3.up*.32f,color,radius*1.08f,.38f,false,420,v.slash);fx.go.transform.Rotate(0,0,-18);v.EmitSprite(position,color,radius,.44f,true,-180,v.sigil);}
+
+        public static void SpawnDeathWave(Vector3 from,Vector3 to,Color color,Camera camera)
+        {var v=Get(camera);Vector3 direction=(to-from).normalized,side=Vector3.Cross(Vector3.up,direction);for(int i=-1;i<=1;i++)v.EmitJagged(from+side*i*.13f,to+side*i*.34f,i==0?color:new Color(.16f,.01f,.04f,1),i==0?.12f:.07f,.38f,3,.08f);}
+
+        public static void SpawnSoulDrain(Vector3 from,Vector3 to,Color color,float radius,Camera camera)
+        {var v=Get(camera);for(int i=0;i<4;i++){float a=i*Mathf.PI*.5f;Vector3 edge=from+new Vector3(Mathf.Cos(a),.12f,Mathf.Sin(a))*radius*.62f;v.EmitJagged(edge,to+Vector3.up*.48f,color,.055f,.52f,5,.16f);}}
+
+        public static void SpawnSoulHarvest(Vector3 position,Color color,float radius,Camera camera)
+        {var v=Get(camera);v.EmitSprite(position,color,radius,.68f,true,-210,v.sigil);for(int i=0;i<5;i++){float a=i*Mathf.PI*2/5;Vector3 edge=position+new Vector3(Mathf.Cos(a),.12f,Mathf.Sin(a))*radius*.72f;v.EmitJagged(edge,position+Vector3.up*.55f,i%2==0?color:new Color(.18f,0,.04f,1),.07f,.55f,4,.18f);}}
+
+        public static void SpawnFuneralVolleyCue(Vector3 position,Vector3 forward,Color color,int count,Camera camera)
+        {var v=Get(camera);Vector3 side=Vector3.Cross(Vector3.up,forward.normalized);for(int i=0;i<Mathf.Clamp(count,3,7);i++){float t=i/(float)(Mathf.Clamp(count,3,7)-1)-.5f;v.EmitJagged(position+side*t*.9f+Vector3.up*.4f,position+side*t*1.15f+forward.normalized*.62f+Vector3.up*.4f,color,.075f,.24f,2,.04f);}}
+
+        public static void SpawnStormTrail(Vector3 position,Vector3 backward,Color color,float radius,Camera camera)
+        {var v=Get(camera);Vector3 end=position+backward.normalized*radius;v.EmitJagged(position+Vector3.up*.12f,end,color,.12f,.52f,7,.22f);v.EmitJagged(position+Vector3.up*.18f,end*.15f+position*.85f,Color.white,.045f,.28f,4,.12f);}
+
+        public static void SpawnDashPath(Vector3 from,Vector3 to,Color color,Camera camera)
+        {var v=Get(camera);Vector3 side=Vector3.Cross(Vector3.up,(to-from).normalized);v.EmitJagged(from+Vector3.up*.32f,to+Vector3.up*.32f,color,.18f,.34f,8,.18f);v.EmitJagged(from+side*.13f+Vector3.up*.42f,to-side*.13f+Vector3.up*.42f,Color.white,.055f,.25f,6,.10f);v.EmitSprite(from+Vector3.up*.42f,new Color(color.r,color.g,color.b,.55f),1.15f,.30f,false,-90,v.slash);v.EmitSprite(to+Vector3.up*.42f,Color.Lerp(color,Color.white,.4f),1.3f,.34f,false,130,v.slash);}
+
+        public static void SpawnKatanaSwing(Vector3 position,Vector3 direction,Color color,float width,Camera camera)
+        {var v=Get(camera);float angle=Mathf.Atan2(direction.z,direction.x)*Mathf.Rad2Deg;var outer=v.EmitSprite(position+direction.normalized*.58f+Vector3.up*.42f,color,width,.28f,false,0,v.slash);outer.go.transform.Rotate(0,0,angle-32);outer.go.transform.localScale=new Vector3(width,width*.72f,1);var edge=v.EmitSprite(position+direction.normalized*.72f+Vector3.up*.46f,Color.white,width*.82f,.20f,false,0,v.slash);edge.go.transform.Rotate(0,0,angle-22);edge.go.transform.localScale=new Vector3(width*.88f,width*.52f,1);}
+
+        public static void SpawnLightningFan(Vector3 position,int count,Color color,float radius,Camera camera)
+        {var v=Get(camera);int rays=Mathf.Clamp(count,5,12);for(int i=0;i<rays;i++){float a=i*Mathf.PI*2/rays;Vector3 end=position+new Vector3(Mathf.Cos(a),0,Mathf.Sin(a))*radius;v.EmitJagged(position,end,i%2==0?Color.white:color,.075f,.28f,5,.16f);}}
+
         private void Initialize(Camera target)
         {
             camera=target;sigil=CreateSigil();slash=CreateSlash();shield=CreateShield();

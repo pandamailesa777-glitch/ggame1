@@ -16,42 +16,50 @@ namespace Nightfall.UnityMvp
         }
         private sealed class Projectile
         {
-            public GameObject go; public Vector3 velocity; public float life,damage,radius,phase; public int hitsRemaining; public bool active,hostile; public Color color; public Enemy lastHit;
+            public GameObject go; public Vector3 velocity; public float life,damage,radius,phase; public int hitsRemaining; public bool active,hostile; public Color color; public Enemy lastHit; public Chest lastChest; public ProjectileVisual visual;
         }
+        private enum ProjectileVisual { Orb, SolarArrow, DeathShard, BloodNeedle, ElectricBolt, SwordWave }
         private sealed class Orb { public GameObject go; public bool active; public int value; public float phase; }
         private sealed class LootPickup { public GameObject go; public bool active; public LootKind kind; public float phase; }
+        private enum ChestRewardKind { Healing, ExperienceCache, MagnetIdol }
+        private sealed class Chest { public GameObject go; public bool active; public int hits; public float phase; }
+        private sealed class ChestReward { public GameObject go; public bool active; public ChestRewardKind kind; public float phase; }
         private sealed class Upgrade { public string name,description,icon; public Action apply; public HeroKind? owner; public int ability=-1; }
 
         private readonly List<Enemy> enemies=new List<Enemy>(220);
         private readonly List<Projectile> projectiles=new List<Projectile>(140);
         private readonly List<Orb> orbs=new List<Orb>(180);
         private readonly List<LootPickup> lootPickups=new List<LootPickup>(32);
+        private readonly List<Chest> chests=new List<Chest>(6);
+        private readonly List<ChestReward> chestRewards=new List<ChestReward>(12);
         private readonly List<Upgrade> upgrades=new List<Upgrade>(20);
         private readonly Upgrade[] offered=new Upgrade[3];
         private readonly List<Vector3> obstaclePositions=new List<Vector3>(48);private readonly List<float> obstacleRadii=new List<float>(48);
         private readonly int[] abilityRanks=new int[5]; private readonly float[] abilityTimers=new float[5];
         private readonly Dictionary<string,int> passiveRanks=new Dictionary<string,int>();
-        private Camera worldCamera; private RuntimeSpriteFactory spriteFactory; private GameAudioController audioController; private Sprite solidSprite;
+        private Camera worldCamera; private RuntimeSpriteFactory spriteFactory; private GameAudioController audioController; private Sprite solidSprite,projectileOrbSprite,solarArrowSprite,deathShardSprite,bloodNeedleSprite,electricBoltSprite,swordWaveSprite;
+        private int qaVfxSlot;
         private GameObject player; private DirectionalSpriteVisual playerVisual; private CharacterVisualController characterVisual; private HeroDefinition hero;
         private State state=State.Menu; private Vector2 moveInput,joystickOrigin; private int joystickFinger=-1;
         private float hp,maxHp,damage,attackDelay,moveSpeed,attackRange=10,critChance=.05f,magnet=2.8f,regen;
-        private int pierce=1,projectileCount=1,level=1,xp,xpNeed=10,kills,bossIndex; private float runTime,spawnClock,attackClock,uniqueClock;
+        private int pierce=1,projectileCount=1,level=1,xp,xpNeed=10,kills,bossIndex; private float runTime,spawnClock,attackClock,uniqueClock,chestSpawnClock,globalMagnetTimer;
         private readonly BossKind[] selectedBosses=new BossKind[3]; private Enemy currentBoss; private bool bossSpawnedForStage;
-        private float suppressionMultiplier=1,invulnerableTimer,zikeVanishTimer,abilityFlashTimer;private string abilityFlash="";private Color abilityFlashColor;private int abilityFlashSlot=-1; private GUIStyle titleStyle,buttonStyle,hudStyle,centerStyle,cardStyle,captionStyle;
+        private float suppressionMultiplier=1,invulnerableTimer,zikeVanishTimer,abilityFlashTimer,masterVolume=1;private string abilityFlash="";private Color abilityFlashColor;private int abilityFlashSlot=-1; private GUIStyle titleStyle,buttonStyle,hudStyle,centerStyle,cardStyle,captionStyle;
         private readonly Texture2D[] heroPortraits=new Texture2D[3];
-        private Texture2D uiMenuBackground,uiPanelFrame,uiButtonPlate,uiCardFrame;
-        private Font uiFont;
+        private Texture2D uiMenuBackground,uiPanelFrame,uiButtonPlate,uiCardFrame,uiLogoPlate,uiTitleWordmark;
+        private Font uiFont,uiCjkFont;
         private readonly Dictionary<string,Material> worldMaterials=new Dictionary<string,Material>();
         private readonly Dictionary<string,Sprite> obstacleSprites=new Dictionary<string,Sprite>();
         private readonly Dictionary<string,Texture2D> uiIcons=new Dictionary<string,Texture2D>();
-        private SpriteRenderer groundRenderer,mapFogRenderer; private readonly Sprite[] mapGroundSprites=new Sprite[2]; private Transform obstacleRoot; private int mapVariant=-1; private bool qaInvulnerable;
-        private int treatsCollected;private bool petUnlocked,petUnlockPending;private PetDefinition petDefinition;private PetController petController;private GameObject petObject;private readonly FamiliarEcho familiarEcho=new FamiliarEcho();private Texture2D petPortrait;
+        private SpriteRenderer groundRenderer,groundUnderlayRenderer,mapFogRenderer; private readonly Sprite[] mapGroundSprites=new Sprite[2]; private Transform obstacleRoot; private int mapVariant=-1; private bool qaInvulnerable;
+        private int treatsCollected,petLevel;private bool petUnlocked,petUnlockPending;private PetDefinition petDefinition;private PetController petController;private GameObject petObject;private readonly FamiliarEcho familiarEcho=new FamiliarEcho();private Texture2D petPortrait;private Sprite petNotificationSprite;
 
         private void Awake()
         {
+            masterVolume=Mathf.Clamp01(PlayerPrefs.GetFloat("BureauBreakers.MasterVolume",.8f));AudioListener.volume=masterVolume;
             solidSprite=CreateSolidSprite();heroPortraits[0]=Resources.Load<Texture2D>("Art/Portraits/hero_amelia_card_v2");heroPortraits[1]=Resources.Load<Texture2D>("Art/Portraits/hero_sam_card_v2");heroPortraits[2]=Resources.Load<Texture2D>("Art/Portraits/hero_zike_card_v2");
-            uiMenuBackground=Resources.Load<Texture2D>("Art/UI/ui_menu_background_v1");uiPanelFrame=Resources.Load<Texture2D>("Art/UI/ui_panel_frame_v1");uiButtonPlate=Resources.Load<Texture2D>("Art/UI/ui_button_plate_v1");uiCardFrame=Resources.Load<Texture2D>("Art/UI/ui_card_frame_v1");
-            uiFont=Resources.Load<Font>("Fonts/RussoOne-Regular");
+            uiMenuBackground=Resources.Load<Texture2D>("Art/UI/ui_menu_background_v1");uiPanelFrame=Resources.Load<Texture2D>("Art/UI/ui_panel_frame_v1");uiButtonPlate=Resources.Load<Texture2D>("Art/UI/ui_button_plate_v1");uiCardFrame=Resources.Load<Texture2D>("Art/UI/ui_card_frame_v1");uiLogoPlate=Resources.Load<Texture2D>("Art/UI/ui_logo_plate_v2");uiTitleWordmark=Resources.Load<Texture2D>("Art/UI/ui_title_wordmark_v3");
+            uiFont=Resources.Load<Font>("Fonts/RussoOne-Regular");uiCjkFont=Resources.Load<Font>("Fonts/NotoSansCJKsc-Regular");
             BuildCamera();audioController=gameObject.AddComponent<GameAudioController>();spriteFactory=new RuntimeSpriteFactory(worldCamera); BuildWorld(); BuildPlayer(); BuildPools(); BuildUpgrades();BuildModernUi();if(Array.Exists(Environment.GetCommandLineArgs(),a=>a=="-nightfallQuickStart")){SetHero(HeroKind.Amelia);StartRun();}
         }
 
@@ -65,6 +73,7 @@ namespace Nightfall.UnityMvp
         private void BuildWorld()
         {
             var texture=Resources.Load<Texture2D>("Art/forest_clearing_v1");texture.wrapMode=TextureWrapMode.Repeat;texture.filterMode=FilterMode.Point;
+            var underlay=new GameObject("MapUnderlay");groundUnderlayRenderer=underlay.AddComponent<SpriteRenderer>();groundUnderlayRenderer.sprite=Sprite.Create(texture,new Rect(0,0,texture.width,texture.height),new Vector2(.5f,.5f),30,0,SpriteMeshType.FullRect);groundUnderlayRenderer.drawMode=SpriteDrawMode.Tiled;groundUnderlayRenderer.size=new Vector2(180,110);groundUnderlayRenderer.sortingOrder=-110;underlay.transform.position=new Vector3(0,-.10f,0);underlay.transform.rotation=Quaternion.Euler(90,0,0);
             var ground=new GameObject("MapGround");groundRenderer=ground.AddComponent<SpriteRenderer>();groundRenderer.sprite=Sprite.Create(texture,new Rect(0,0,texture.width,texture.height),new Vector2(.5f,.5f),30,0,SpriteMeshType.FullRect);groundRenderer.drawMode=SpriteDrawMode.Tiled;groundRenderer.size=new Vector2(78,46);groundRenderer.sortingOrder=-100;ground.transform.position=new Vector3(0,-.08f,0);ground.transform.rotation=Quaternion.Euler(90,0,0);
             string[] generatedMaps={"Art/Maps/forest_arena_v1","Art/Maps/moon_arena_v1"};for(int i=0;i<2;i++){var generated=Resources.Load<Texture2D>(generatedMaps[i]);if(generated!=null){generated.filterMode=FilterMode.Point;generated.wrapMode=TextureWrapMode.Clamp;mapGroundSprites[i]=Sprite.Create(generated,new Rect(0,0,generated.width,generated.height),new Vector2(.5f,.5f),32,0,SpriteMeshType.FullRect);}}
             var fogTexture=Resources.Load<Texture2D>("Art/Environment/map_edge_fog_ring_v2");if(fogTexture!=null)BuildMapEdgeFog(fogTexture);
@@ -79,11 +88,12 @@ namespace Nightfall.UnityMvp
             // The second arena is a colder, moonlit clearing with a rotated ground
             // and its own prop layout. Both maps deliberately share collision rules.
             if(mapGroundSprites[mapVariant]!=null){groundRenderer.drawMode=SpriteDrawMode.Simple;groundRenderer.sprite=mapGroundSprites[mapVariant];groundRenderer.color=Color.white;}else groundRenderer.color=mapVariant==0?Color.white:new Color(.58f,.72f,.86f);
-            groundRenderer.transform.rotation=Quaternion.Euler(90,0,0);
+            if(groundUnderlayRenderer!=null)groundUnderlayRenderer.color=mapVariant==0?new Color(.62f,.68f,.62f,1):new Color(.42f,.58f,.72f,1);
+            groundRenderer.transform.rotation=Quaternion.Euler(90,0,0);groundRenderer.transform.localScale=new Vector3(2.6f,2.6f,1f);
             if(mapFogRenderer!=null)mapFogRenderer.color=mapVariant==0?new Color(.76f,.84f,.92f,.88f):new Color(.38f,.66f,.92f,.94f);
-            for(int i=0;i<68;i++)
+            for(int i=0;i<46;i++)
             {
-                int type=i%12;float radius=type==7||type==8||type==9||type==11?1.0f:type==5?1.15f:.72f;
+                int type=i%12;float radius=ObstacleRadius(type);
                 Vector3 pos=FindObstaclePosition(i,radius);
                 obstaclePositions.Add(new Vector3(pos.x,0,pos.z));obstacleRadii.Add(radius);CreateObstacle(obstacleRoot,pos,type,i);
             }
@@ -91,7 +101,7 @@ namespace Nightfall.UnityMvp
 
         private Vector3 FindObstaclePosition(int index,float radius)
         {
-            const float goldenAngle=2.399963f,minVisualGap=.72f;
+            const float goldenAngle=2.399963f,minVisualGap=1.15f;
             for(int attempt=0;attempt<40;attempt++)
             {
                 int mapSalt=mapVariant*97;int sample=index+mapSalt+attempt*68;float angle=sample*goldenAngle;
@@ -99,7 +109,7 @@ namespace Nightfall.UnityMvp
                 Vector3 candidate=new Vector3(Mathf.Cos(angle)*distance,.02f,Mathf.Sin(angle)*distance*.58f);
                 if(Mathf.Abs(candidate.x)<3.2f&&Mathf.Abs(candidate.z)<7)
                     candidate.x+=Mathf.Sign(candidate.x==0?1:candidate.x)*4.5f;
-                bool clear=true;
+                bool clear=IsObstacleSurface(candidate);
                 for(int j=0;j<obstaclePositions.Count;j++)
                 {
                     float required=radius+obstacleRadii[j]+minVisualGap;
@@ -114,10 +124,20 @@ namespace Nightfall.UnityMvp
             return new Vector3(Mathf.Cos(fallbackAngle)*fallbackDistance,.02f,Mathf.Sin(fallbackAngle)*fallbackDistance*.72f);
         }
 
+        private bool IsObstacleSurface(Vector3 worldPosition)
+        {
+            if(mapVariant<0||mapVariant>=mapGroundSprites.Length||mapGroundSprites[mapVariant]==null)return true;var texture=mapGroundSprites[mapVariant].texture;if(texture==null||!texture.isReadable)return true;
+            float u=Mathf.Clamp01(worldPosition.x/(64f*1.8f)+.5f),v=Mathf.Clamp01(worldPosition.z/(48f*1.8f)+.5f);Color sample=texture.GetPixelBilinear(u,v);float luminance=sample.r*.30f+sample.g*.59f+sample.b*.11f;
+            // Both generated arenas encode walkways as their brightest surface.
+            // Props belong on forest soil / snow fields, leaving roads and plazas readable.
+            return mapVariant==0?luminance<.34f:luminance<.58f;
+        }
+
         private void BuildMapEdgeFog(Texture2D texture)
         {
-            var go=new GameObject("ContinuousMapEdgeFog");mapFogRenderer=go.AddComponent<SpriteRenderer>();mapFogRenderer.sprite=Sprite.Create(texture,new Rect(0,0,texture.width,texture.height),new Vector2(.5f,.5f),30,0,SpriteMeshType.FullRect);mapFogRenderer.sortingOrder=24;mapFogRenderer.color=new Color(.76f,.84f,.92f,.88f);
-            go.transform.position=new Vector3(0,.04f,0);go.transform.rotation=Quaternion.Euler(90,0,0);go.transform.localScale=new Vector3(2.05f,1.75f,1);
+            texture.wrapMode=TextureWrapMode.Repeat;
+            var go=new GameObject("MapBoundaryFog");mapFogRenderer=go.AddComponent<SpriteRenderer>();mapFogRenderer.sprite=Sprite.Create(texture,new Rect(0,0,texture.width,texture.height),new Vector2(.5f,.5f),30,0,SpriteMeshType.FullRect);mapFogRenderer.sortingOrder=24;mapFogRenderer.color=new Color(.76f,.84f,.92f,.82f);
+            go.transform.position=new Vector3(0,.04f,0);go.transform.rotation=Quaternion.Euler(90,0,0);go.transform.localScale=new Vector3(1.95f,2.40f,1);
         }
 
         private Material WorldMaterial(string id,Color color)
@@ -130,9 +150,10 @@ namespace Nightfall.UnityMvp
         }
         private void CreateObstacle(Transform parent,Vector3 position,int type,int index)
         {
-            string[] resources={"obstacle_oak","obstacle_pine","obstacle_dead_tree","obstacle_oak","obstacle_bush","obstacle_bush","obstacle_thorn_bush","obstacle_broken_wall","obstacle_broken_wall","obstacle_fallen_column","obstacle_rubble","obstacle_ruined_arch"};
-            float[] scales={1f,1f,1f,.86f,.92f,1.22f,1f,1f,.86f,1f,1f,1f};
-            string id=resources[Mathf.Clamp(type,0,resources.Length-1)];
+            string[] summer={"forest_gnarled_oak_v2","forest_shrub_v2","forest_root_wall_v2","forest_moss_column_v2","forest_gnarled_oak_v2","forest_shrub_v2","forest_root_wall_v2","forest_moss_column_v2","forest_shrub_v2","forest_gnarled_oak_v2","forest_root_wall_v2","forest_moss_column_v2"};
+            string[] winter={"winter_frost_pine_v1","winter_ice_crystals_v1","winter_frozen_wall_v1","winter_frozen_arch_v1","winter_frost_pine_v1","winter_ice_crystals_v1","winter_frozen_wall_v1","winter_frozen_arch_v1","winter_ice_crystals_v1","winter_frost_pine_v1","winter_frozen_wall_v1","winter_frozen_arch_v1"};
+            float[] summerScales={1.12f,.92f,1f,.92f,.94f,1.16f,.86f,1.08f,.78f,1.22f,1.12f,.84f};float[] winterScales={1.08f,.86f,1f,1.06f,.92f,1.12f,.86f,.94f,.76f,1.18f,1.14f,.88f};
+            int safeType=Mathf.Clamp(type,0,11);string id=(mapVariant==1?winter:summer)[safeType];
             if(!obstacleSprites.TryGetValue(id,out var sprite))
             {
                 var texture=Resources.Load<Texture2D>("Art/Obstacles/"+id);
@@ -144,9 +165,11 @@ namespace Nightfall.UnityMvp
                 obstacleSprites[id]=sprite;
             }
             var root=new GameObject($"Obstacle_{index:00}_Type_{type+1:00}").transform;root.SetParent(parent,false);root.position=new Vector3(position.x,.02f,position.z);root.rotation=worldCamera.transform.rotation;
-            var renderer=root.gameObject.AddComponent<SpriteRenderer>();renderer.sprite=sprite;renderer.sortingOrder=7;
-            float mirror=index%2==0?1:-1;float size=scales[Mathf.Clamp(type,0,scales.Length-1)];root.localScale=new Vector3(size*mirror,size,size);
+            var renderer=root.gameObject.AddComponent<SpriteRenderer>();renderer.sprite=sprite;renderer.sortingOrder=7;renderer.color=Color.white;
+            float mirror=index%2==0?1:-1;float size=(mapVariant==1?winterScales:summerScales)[safeType];root.localScale=new Vector3(size*mirror,size,size);
         }
+
+        private float ObstacleRadius(int type){int kind=Mathf.Abs(type)%4;if(kind==2||kind==3)return 1f;if(kind==0)return .82f;return .68f;}
 
         private void BuildPlayer(){player=new GameObject("Player");player.transform.position=new Vector3(0,.03f,0);characterVisual=player.AddComponent<CharacterVisualController>();SetHero(HeroKind.Amelia);player.SetActive(false);}
         private void SetHero(HeroKind kind)
@@ -157,10 +180,16 @@ namespace Nightfall.UnityMvp
         private void BuildPools()
         {
             for(int i=0;i<210;i++){var go=new GameObject("EnemyPool_"+i);go.SetActive(false);enemies.Add(new Enemy{go=go});}
-            var projectileSprite=CreateProjectileSprite();for(int i=0;i<130;i++){var go=CreateColoredSprite("Projectile_"+i,Color.white,.72f,false);go.GetComponent<SpriteRenderer>().sprite=projectileSprite;go.GetComponent<SpriteRenderer>().sortingOrder=18;projectiles.Add(new Projectile{go=go});}
+            projectileOrbSprite=CreateProjectileSprite();solarArrowSprite=CreateProjectileShape(0);deathShardSprite=CreateProjectileShape(1);bloodNeedleSprite=CreateProjectileShape(2);electricBoltSprite=CreateProjectileShape(3);swordWaveSprite=CreateProjectileShape(4);for(int i=0;i<130;i++){var go=CreateColoredSprite("Projectile_"+i,Color.white,.72f,false);go.GetComponent<SpriteRenderer>().sprite=projectileOrbSprite;go.GetComponent<SpriteRenderer>().sortingOrder=18;projectiles.Add(new Projectile{go=go});}
             var experienceSprite=CreateExperienceSprite();for(int i=0;i<170;i++){var go=CreateColoredSprite("Experience_"+i,new Color(.12f,1,.88f),.48f,false);go.GetComponent<SpriteRenderer>().sprite=experienceSprite;go.GetComponent<SpriteRenderer>().sortingOrder=16;orbs.Add(new Orb{go=go,phase=Random.value*Mathf.PI*2});}
             var treatSprite=CreateTreatSprite();for(int i=0;i<24;i++){var go=CreateColoredSprite("Treat_"+i,new Color(1,.58f,.18f),.58f,false);go.GetComponent<SpriteRenderer>().sprite=treatSprite;go.GetComponent<SpriteRenderer>().sortingOrder=17;lootPickups.Add(new LootPickup{go=go,kind=LootKind.Treat,phase=Random.value*Mathf.PI*2});}
+            Sprite chestSprite=LoadLootSprite("chest",96);
+            for(int i=0;i<6;i++){var go=CreateColoredSprite("WorldChest_"+i,Color.white,1,false);var renderer=go.GetComponent<SpriteRenderer>();renderer.sprite=chestSprite;renderer.sortingOrder=14;chests.Add(new Chest{go=go,phase=Random.value*Mathf.PI*2});}
+            for(int i=0;i<12;i++){var go=CreateColoredSprite("ChestReward_"+i,Color.white,.82f,false);var renderer=go.GetComponent<SpriteRenderer>();renderer.sortingOrder=17;chestRewards.Add(new ChestReward{go=go,phase=Random.value*Mathf.PI*2});}
         }
+
+        private Sprite LoadLootSprite(string id,float ppu){var texture=Resources.Load<Texture2D>("Art/Loot/"+id);if(texture==null)return solidSprite;texture.filterMode=FilterMode.Point;texture.wrapMode=TextureWrapMode.Clamp;return Sprite.Create(texture,new Rect(0,0,texture.width,texture.height),new Vector2(.5f,.12f),ppu,0,SpriteMeshType.FullRect);}
+        private Sprite ChestRewardSprite(ChestRewardKind kind){string id=kind==ChestRewardKind.Healing?"healing_pickup":kind==ChestRewardKind.ExperienceCache?"xp_cache":"magnet_idol";return LoadLootSprite(id,64);}
 
         private GameObject CreateColoredSprite(string name,Color color,float scale,bool active)
         {var go=new GameObject(name);var r=go.AddComponent<SpriteRenderer>();r.sprite=solidSprite;r.color=color;go.transform.localScale=Vector3.one*scale;go.SetActive(active);return go;}
@@ -175,7 +204,8 @@ namespace Nightfall.UnityMvp
             UpdateBossTimeline(); attackClock-=dt;if(attackClock<=0){AutoAttack();attackClock=attackDelay/suppressionMultiplier;}
             uniqueClock-=dt;if(uniqueClock<=0){UseUniqueAbility();uniqueClock=hero.kind==HeroKind.Amelia?7.5f:hero.kind==HeroKind.Sam?6.2f:5.2f;}
             invulnerableTimer=Mathf.Max(0,invulnerableTimer-dt);abilityFlashTimer=Mathf.Max(0,abilityFlashTimer-dt);UpdateHeroAbilities(dt);
-            UpdateEnemies(dt);UpdateProjectiles(dt);UpdateOrbs(dt);UpdateLoot(dt);UpdatePet(dt);
+            chestSpawnClock-=dt;if(chestSpawnClock<=0){TrySpawnChest();chestSpawnClock=Random.Range(38f,62f);}globalMagnetTimer=Mathf.Max(0,globalMagnetTimer-dt);
+            UpdateEnemies(dt);UpdateProjectiles(dt);UpdateOrbs(dt);UpdateLoot(dt);UpdateChests(dt);UpdateChestRewards(dt);UpdatePet(dt);
         }
 
         private void ReadInput()
@@ -226,7 +256,7 @@ namespace Nightfall.UnityMvp
         private Enemy SpawnEnemy(EnemyKind kind,float radius)
         {
             Enemy e=GetEnemy();if(e==null)return null;var d=GameCatalog.Enemy(kind);float a=Random.value*Mathf.PI*2;
-            Vector3 direction=new Vector3(Mathf.Cos(a),0,Mathf.Sin(a));float tx=Mathf.Abs(direction.x)>.001f?((direction.x>0?37.2f:-37.2f)-player.transform.position.x)/direction.x:float.PositiveInfinity;float tz=Mathf.Abs(direction.z)>.001f?((direction.z>0?21.2f:-21.2f)-player.transform.position.z)/direction.z:float.PositiveInfinity;float edgeDistance=Mathf.Min(tx>0?tx:float.PositiveInfinity,tz>0?tz:float.PositiveInfinity);if(float.IsInfinity(edgeDistance))edgeDistance=radius;
+            Vector3 direction=new Vector3(Mathf.Cos(a),0,Mathf.Sin(a));float tx=Mathf.Abs(direction.x)>.001f?((direction.x>0?46f:-46f)-player.transform.position.x)/direction.x:float.PositiveInfinity;float tz=Mathf.Abs(direction.z)>.001f?((direction.z>0?29f:-29f)-player.transform.position.z)/direction.z:float.PositiveInfinity;float edgeDistance=Mathf.Min(tx>0?tx:float.PositiveInfinity,tz>0?tz:float.PositiveInfinity);if(float.IsInfinity(edgeDistance))edgeDistance=radius;
             e.go.transform.position=player.transform.position+direction*edgeDistance+Vector3.up*.03f;e.def=d;e.boss=null;e.maxHp=e.hp=d.hp*(1+runTime/780f);e.attackClock=Random.value*d.cooldown;e.abilityClock=1+Random.value*2;e.phaseTwo=false;e.active=true;e.generation++;
             e.visual=spriteFactory.Bind(e.go,d.spriteId);e.visual.SetScale(d.scale);e.visual.SetProceduralLocomotion(true);e.go.SetActive(true);return e;
         }
@@ -285,13 +315,13 @@ namespace Nightfall.UnityMvp
         private void AutoAttack()
         {
             Enemy target=NearestEnemy();if(target==null)return;Vector3 baseDir=(target.go.transform.position-player.transform.position).normalized;
-            characterVisual.PlayAttack(baseDir,()=>{Color attackColor=hero.attack==AttackKind.Light?new Color(1,.82f,.32f):hero.attack==AttackKind.Death?new Color(.85f,.05f,.2f):new Color(.15f,.8f,1);CombatVfxPool.SpawnAttack(player.transform.position,baseDir,attackColor,(int)hero.kind,worldCamera);for(int i=0;i<projectileCount;i++){float spread=(i-(projectileCount-1)*.5f)*8;Vector3 dir=Quaternion.Euler(0,spread,0)*baseDir;Color c=hero.attack==AttackKind.Light?new Color(1,.75f,.2f):hero.attack==AttackKind.Death?new Color(.75f,.04f,.18f):Color.cyan;SpawnProjectile(characterVisual.AttackOrigin(),dir,damage,10,false,c);}});
+            characterVisual.PlayAttack(baseDir,()=>{Color attackColor=hero.attack==AttackKind.Light?new Color(1,.82f,.32f):hero.attack==AttackKind.Death?new Color(.85f,.05f,.2f):new Color(.15f,.8f,1);if(hero.kind==HeroKind.Zike)AbilityVfxController.SpawnKatanaSwing(player.transform.position,baseDir,new Color(.25f,.88f,1),2.45f,worldCamera);else CombatVfxPool.SpawnAttack(player.transform.position,baseDir,attackColor,(int)hero.kind,worldCamera);ProjectileVisual visual=hero.kind==HeroKind.Amelia?ProjectileVisual.SolarArrow:hero.kind==HeroKind.Sam?ProjectileVisual.DeathShard:ProjectileVisual.SwordWave;for(int i=0;i<projectileCount;i++){float spread=(i-(projectileCount-1)*.5f)*8;Vector3 dir=Quaternion.Euler(0,spread,0)*baseDir;Color c=hero.attack==AttackKind.Light?new Color(1,.75f,.2f):hero.attack==AttackKind.Death?new Color(.75f,.04f,.18f):Color.cyan;SpawnProjectile(characterVisual.AttackOrigin(),dir,damage,hero.kind==HeroKind.Zike?12:10,false,c,visual);}});
         }
         private Enemy NearestEnemy(){Enemy result=null;float best=attackRange*attackRange;foreach(var e in enemies){if(!e.active)continue;float d=(e.go.transform.position-player.transform.position).sqrMagnitude;if(d<best){best=d;result=e;}}return result;}
 
         private void UseUniqueAbility()
         {
-            Color color=AbilityColor(hero.kind);audioController.PlayAbility(hero.kind,0);AbilityBurst(player.transform.position,color,(int)hero.kind);
+            Color color=AbilityColor(hero.kind);audioController.PlayAbility(hero.kind,0);AbilityVfxController.SpawnCastFlash(player.transform.position,color,.72f,worldCamera);
             if(hero.kind==HeroKind.Amelia){float dealt=DamageRadius(player.transform.position,2.7f,damage*1.3f);hp=Mathf.Min(maxHp,hp+8+dealt*.015f);Pulse(player.transform.position,color,2.7f);}
             else if(hero.kind==HeroKind.Sam){float dealt=DamageRadius(player.transform.position,2.35f,damage*1.55f);hp=Mathf.Min(maxHp,hp+dealt*.07f);Pulse(player.transform.position,color,2.35f);}
             else{Enemy from=NearestEnemy();for(int i=0;i<5&&from!=null;i++){Hit(from,damage*.8f);Enemy next=NearestTo(from.go.transform.position,from);from=next;}Pulse(player.transform.position,color,3);}
@@ -300,7 +330,7 @@ namespace Nightfall.UnityMvp
         private void UpdateHeroAbilities(float dt)
         {
             for(int i=0;i<5;i++){if(abilityRanks[i]<=0)continue;abilityTimers[i]-=dt;if(abilityTimers[i]<=0)CastHeroAbility(i);}
-            if(zikeVanishTimer>0){zikeVanishTimer-=dt;if(zikeVanishTimer<=0){characterVisual.SetVisible(true);DamageRadius(player.transform.position,2.1f+abilityRanks[1]*.18f,damage*(1.25f+abilityRanks[1]*.12f));AbilityVfxController.SpawnCrossSlash(player.transform.position,Color.cyan,2.4f,worldCamera);Pulse(player.transform.position,Color.cyan,2.2f);}}
+            if(zikeVanishTimer>0){zikeVanishTimer-=dt;if(zikeVanishTimer<=0)characterVisual.SetVisible(true);}
         }
 
         private void CastHeroAbility(int slot)
@@ -308,44 +338,44 @@ namespace Nightfall.UnityMvp
             bool needsTarget=(hero.kind==HeroKind.Amelia&&slot==1)||(hero.kind==HeroKind.Sam&&slot==1)||(hero.kind==HeroKind.Zike&&slot==0);
             if(needsTarget&&NearestEnemy()==null){abilityTimers[slot]=.25f;return;}
             if(hero.kind==HeroKind.Zike&&slot==2&&moveInput.sqrMagnitude<=.05f){abilityTimers[slot]=.2f;return;}
-            int rank=abilityRanks[slot];bool evolved=rank>=6;abilityFlash=AbilityName(hero.kind,slot)+(evolved?" • ЭВОЛЮЦИЯ":"");abilityFlashTimer=.85f;abilityFlashColor=AbilityColor(hero.kind);abilityFlashSlot=slot;audioController.PlayAbility(hero.kind,slot);characterVisual.PlayCast();AbilityBurst(player.transform.position,abilityFlashColor,(int)hero.kind);
+            int rank=abilityRanks[slot];bool evolved=rank>=6;abilityFlash=AbilityName(hero.kind,slot)+(evolved?" • "+GameLocalization.Tr("ЭВОЛЮЦИЯ"):"");abilityFlashTimer=.85f;abilityFlashColor=AbilityColor(hero.kind);abilityFlashSlot=slot;audioController.PlayAbility(hero.kind,slot);characterVisual.PlayCast();AbilityVfxController.SpawnCastFlash(player.transform.position,abilityFlashColor,.55f+rank*.035f,worldCamera);
             if(hero.kind==HeroKind.Amelia)
             {
-                if(slot==0){float radius=2.2f+rank*.28f;AbilityVfxController.SpawnSigil(player.transform.position,new Color(1,.76f,.18f),radius,0,worldCamera);float dealt=DamageRadius(player.transform.position,radius,damage*(.65f+rank*.16f));hp=Mathf.Min(maxHp,hp+4+dealt*(.012f+rank*.003f));Pulse(player.transform.position,new Color(1,.82f,.3f),radius);if(evolved)RadialShots(player.transform.position,8,damage*.45f,new Color(1,.92f,.55f));abilityTimers[slot]=Mathf.Max(4.2f,8-rank*.45f);}
+                if(slot==0){float radius=2.2f+rank*.28f;AbilityVfxController.SpawnSigil(player.transform.position,new Color(1,.76f,.18f),radius,0,worldCamera);float dealt=DamageRadius(player.transform.position,radius,damage*(.65f+rank*.16f));hp=Mathf.Min(maxHp,hp+4+dealt*(.012f+rank*.003f));AbilityVfxController.SpawnHealingRise(player.transform.position,new Color(1,.94f,.62f),radius,worldCamera);if(evolved)RadialShots(player.transform.position,8,damage*.45f,new Color(1,.92f,.55f),ProjectileVisual.SolarArrow);abilityTimers[slot]=Mathf.Max(4.2f,8-rank*.45f);}
                 else if(slot==1){int lashes=2+rank/2;for(int i=0;i<lashes;i++){Enemy target=NearestEnemy();if(target!=null){Vector3 hitPos=target.go.transform.position;AbilityVfxController.SpawnWhip(player.transform.position,hitPos,i%2==0?new Color(1,.72f,.12f):Color.white,worldCamera);Hit(target,damage*(.8f+rank*.2f));Pulse(hitPos,new Color(1,.78f,.3f),1.15f);}}if(evolved)DamageRadius(player.transform.position,3.8f,damage*1.15f);abilityTimers[slot]=Mathf.Max(2.5f,5.5f-rank*.35f);}
-                else if(slot==2){hp=Mathf.Min(maxHp,hp+8+rank*4);invulnerableTimer=.25f+rank*.12f;AbilityVfxController.SpawnShield(player.transform.position,new Color(1,.88f,.38f),1.8f+rank*.12f,worldCamera);Pulse(player.transform.position,new Color(.95f,.95f,.65f),2+rank*.2f);if(evolved)DamageRadius(player.transform.position,3.5f,damage*1.6f);abilityTimers[slot]=Mathf.Max(7,12-rank*.55f);}
-                else if(slot==3){int rays=5+rank;AbilityVfxController.SpawnRuneBloom(player.transform.position,new Color(1,.92f,.42f),2.2f+rank*.12f,worldCamera);RadialShots(player.transform.position,rays,damage*(.48f+rank*.08f),new Color(1,.92f,.58f));if(evolved)hp=Mathf.Min(maxHp,hp+18);abilityTimers[slot]=Mathf.Max(3.4f,7.2f-rank*.42f);}
+                else if(slot==2){hp=Mathf.Min(maxHp,hp+8+rank*4);invulnerableTimer=.25f+rank*.12f;AbilityVfxController.SpawnShield(player.transform.position,new Color(1,.88f,.38f),1.8f+rank*.12f,worldCamera);AbilityVfxController.SpawnHealingRise(player.transform.position,new Color(.95f,.95f,.65f),1.6f+rank*.12f,worldCamera);if(evolved)DamageRadius(player.transform.position,3.5f,damage*1.6f);abilityTimers[slot]=Mathf.Max(7,12-rank*.55f);}
+                else if(slot==3){int rays=5+rank;Enemy target=NearestEnemy();Vector3 forward=target!=null?(target.go.transform.position-player.transform.position).normalized:Vector3.forward;AbilityVfxController.SpawnArrowVolleyCue(player.transform.position,forward,new Color(1,.92f,.42f),rays,worldCamera);FanShots(player.transform.position,forward,rays,damage*(.48f+rank*.08f),new Color(1,.92f,.58f),ProjectileVisual.SolarArrow);if(evolved)hp=Mathf.Min(maxHp,hp+18);abilityTimers[slot]=Mathf.Max(3.4f,7.2f-rank*.42f);}
                 else{float radius=2.4f+rank*.25f;float dealt=DamageRadius(player.transform.position,radius,damage*(.45f+rank*.12f));hp=Mathf.Min(maxHp,hp+dealt*.02f);invulnerableTimer=Mathf.Max(invulnerableTimer,.12f+rank*.05f);AbilityVfxController.SpawnShield(player.transform.position,new Color(1,.72f,.22f),radius,worldCamera);abilityTimers[slot]=Mathf.Max(5.5f,10-rank*.45f);}
             }
             else if(hero.kind==HeroKind.Sam)
             {
-                if(slot==0){float radius=1.65f+rank*.28f;AbilityVfxController.SpawnSigil(player.transform.position,new Color(.72f,.015f,.10f),radius,1,worldCamera);float dealt=DamageRadius(player.transform.position,radius,damage*(.75f+rank*.18f));hp=Mathf.Min(maxHp,hp+dealt*(.035f+rank*.008f));Pulse(player.transform.position,new Color(.65f,.03f,.16f),radius);if(evolved)RadialShots(player.transform.position,10,damage*.42f,new Color(.8f,.04f,.18f));abilityTimers[slot]=Mathf.Max(2.8f,6.2f-rank*.4f);}
-                else if(slot==1){Enemy t=NearestEnemy();if(t!=null){Vector3 targetPos=t.go.transform.position,dir=(targetPos-player.transform.position).normalized;AbilityVfxController.SpawnBeam(player.transform.position,targetPos,new Color(.9f,.02f,.16f),worldCamera);for(int i=0;i<1+rank/2;i++)SpawnProjectile(player.transform.position+Vector3.up*.55f,Quaternion.Euler(0,(i-rank/4f)*9,0)*dir,damage*(1+rank*.18f),9,false,new Color(.7f,.02f,.2f));}if(evolved)DamageRadius(player.transform.position,2.6f,damage*.8f);abilityTimers[slot]=Mathf.Max(2.4f,5-rank*.3f);}
-                else if(slot==2){RadialShots(player.transform.position,4+rank*2,damage*(.38f+rank*.06f),new Color(.45f,.01f,.12f));hp=Mathf.Min(maxHp,hp+rank*2);if(evolved){critChance+=.005f;Pulse(player.transform.position,Color.black,3.5f);}abilityTimers[slot]=Mathf.Max(4,8-rank*.4f);}
-                else if(slot==3){float radius=2f+rank*.22f;AbilityVfxController.SpawnBladeWheel(player.transform.position,new Color(.72f,.01f,.10f),radius,worldCamera);float dealt=DamageRadius(player.transform.position,radius,damage*(.62f+rank*.13f));hp=Mathf.Min(maxHp,hp+dealt*(.025f+rank*.004f));Pulse(player.transform.position,new Color(.55f,0,.08f),radius);abilityTimers[slot]=Mathf.Max(3.2f,6.8f-rank*.38f);}
-                else{Enemy t=NearestEnemy();if(t!=null){Vector3 dir=(t.go.transform.position-player.transform.position).normalized;for(int i=-1-rank/3;i<=1+rank/3;i++)SpawnProjectile(player.transform.position+Vector3.up*.55f,Quaternion.Euler(0,i*11,0)*dir,damage*(.7f+rank*.12f),8.5f,false,new Color(.22f,0,.05f));}if(evolved)RadialShots(player.transform.position,12,damage*.38f,Color.red);abilityTimers[slot]=Mathf.Max(3.6f,7.5f-rank*.4f);}
+                if(slot==0){float radius=1.65f+rank*.28f;AbilityVfxController.SpawnStaffSweep(player.transform.position,new Color(.72f,.015f,.10f),radius,worldCamera);float dealt=DamageRadius(player.transform.position,radius,damage*(.75f+rank*.18f));hp=Mathf.Min(maxHp,hp+dealt*(.035f+rank*.008f));AbilityVfxController.SpawnSoulDrain(player.transform.position,player.transform.position,new Color(.8f,.04f,.18f),radius,worldCamera);if(evolved)RadialShots(player.transform.position,10,damage*.42f,new Color(.8f,.04f,.18f),ProjectileVisual.BloodNeedle);abilityTimers[slot]=Mathf.Max(2.8f,6.2f-rank*.4f);}
+                else if(slot==1){Enemy t=NearestEnemy();if(t!=null){Vector3 targetPos=t.go.transform.position,dir=(targetPos-player.transform.position).normalized;AbilityVfxController.SpawnDeathWave(player.transform.position,targetPos,new Color(.9f,.02f,.16f),worldCamera);for(int i=0;i<1+rank/2;i++)SpawnProjectile(player.transform.position+Vector3.up*.55f,Quaternion.Euler(0,(i-rank/4f)*9,0)*dir,damage*(1+rank*.18f),9,false,new Color(.7f,.02f,.2f),ProjectileVisual.DeathShard);}if(evolved)DamageRadius(player.transform.position,2.6f,damage*.8f);abilityTimers[slot]=Mathf.Max(2.4f,5-rank*.3f);}
+                else if(slot==2){RadialShots(player.transform.position,4+rank*2,damage*(.38f+rank*.06f),new Color(.45f,.01f,.12f),ProjectileVisual.BloodNeedle);hp=Mathf.Min(maxHp,hp+rank*2);AbilityVfxController.SpawnSoulDrain(player.transform.position,player.transform.position,new Color(.7f,.01f,.12f),2.1f,worldCamera);if(evolved){critChance+=.005f;AbilityVfxController.SpawnSigil(player.transform.position,new Color(.3f,0,.05f),3.5f,1,worldCamera);}abilityTimers[slot]=Mathf.Max(4,8-rank*.4f);}
+                else if(slot==3){float radius=2f+rank*.22f;AbilityVfxController.SpawnSoulHarvest(player.transform.position,new Color(.72f,.01f,.10f),radius,worldCamera);float dealt=DamageRadius(player.transform.position,radius,damage*(.62f+rank*.13f));hp=Mathf.Min(maxHp,hp+dealt*(.025f+rank*.004f));abilityTimers[slot]=Mathf.Max(3.2f,6.8f-rank*.38f);}
+                else{Enemy t=NearestEnemy();if(t!=null){Vector3 dir=(t.go.transform.position-player.transform.position).normalized;int count=3+2*(rank/3);AbilityVfxController.SpawnFuneralVolleyCue(player.transform.position,dir,new Color(.55f,0,.08f),count,worldCamera);FanShots(player.transform.position,dir,count,damage*(.7f+rank*.12f),new Color(.22f,0,.05f),ProjectileVisual.DeathShard);}if(evolved)RadialShots(player.transform.position,12,damage*.38f,Color.red,ProjectileVisual.BloodNeedle);abilityTimers[slot]=Mathf.Max(3.6f,7.5f-rank*.4f);}
             }
             else
             {
                 if(slot==0){Enemy from=NearestEnemy();Vector3 previous=player.transform.position;int jumps=2+rank;for(int i=0;i<jumps&&from!=null;i++){Vector3 hitPos=from.go.transform.position;AbilityVfxController.SpawnLightning(previous,hitPos,Color.cyan,worldCamera);Hit(from,damage*(.55f+rank*.1f));Pulse(hitPos,Color.cyan,1.0f);previous=hitPos;from=NearestTo(hitPos,from);}if(evolved)RadialShots(player.transform.position,8,damage*.5f,Color.cyan);abilityTimers[slot]=Mathf.Max(2.2f,5-rank*.35f);}
-                else if(slot==1){invulnerableTimer=1.05f;zikeVanishTimer=1;AbilityVfxController.SpawnCrossSlash(player.transform.position,Color.cyan,2.0f,worldCamera);characterVisual.SetVisible(false);DamageRadius(player.transform.position,1.8f+rank*.15f,damage*(1+rank*.14f));player.transform.position+=new Vector3(moveInput.x,0,moveInput.y).normalized*(1.5f+rank*.22f);if(evolved)RadialShots(player.transform.position,12,damage*.45f,Color.cyan);abilityTimers[slot]=Mathf.Max(5,10-rank*.55f);}
-                else if(slot==2){if(moveInput.sqrMagnitude>.05f){DamageRadius(player.transform.position,1.25f+rank*.12f,damage*(.35f+rank*.07f));AbilityVfxController.SpawnSigil(player.transform.position,new Color(.05f,.55f,1),1.45f,2,worldCamera);}if(evolved){Enemy t=NearestEnemy();if(t!=null){Hit(t,damage*2.2f);AbilityVfxController.SpawnLightning(player.transform.position,t.go.transform.position,Color.white,worldCamera);Pulse(t.go.transform.position,Color.white,1.5f);}}abilityTimers[slot]=Mathf.Max(.65f,1.8f-rank*.14f);}
+                else if(slot==1){Vector3 start=player.transform.position,dashDir=new Vector3(moveInput.x,0,moveInput.y);Enemy dashTarget=NearestEnemy();if(dashDir.sqrMagnitude<=.05f&&dashTarget!=null)dashDir=dashTarget.go.transform.position-start;if(dashDir.sqrMagnitude<=.05f)dashDir=Vector3.forward;dashDir.Normalize();float dashDistance=1.8f+rank*.25f;Vector3 destination=start+dashDir*dashDistance;invulnerableTimer=.55f+rank*.035f;zikeVanishTimer=.18f;characterVisual.SetVisible(false);AbilityVfxController.SpawnDashPath(start,destination,new Color(.12f,.78f,1),worldCamera);player.transform.position=destination;characterVisual.PlayAttack(dashDir,null);float radius=1.65f+rank*.17f;DamageRadius(destination,radius,damage*(1.25f+rank*.17f));AbilityVfxController.SpawnCrossSlash(destination,Color.cyan,1.9f+rank*.10f,worldCamera);AbilityVfxController.SpawnProjectileImpact(destination,Color.white,2,.8f,worldCamera);if(evolved)RadialShots(destination,12,damage*.45f,Color.cyan,ProjectileVisual.ElectricBolt);abilityTimers[slot]=Mathf.Max(5,10-rank*.55f);}
+                else if(slot==2){if(moveInput.sqrMagnitude>.05f){DamageRadius(player.transform.position,1.25f+rank*.12f,damage*(.35f+rank*.07f));AbilityVfxController.SpawnStormTrail(player.transform.position,-new Vector3(moveInput.x,0,moveInput.y).normalized,new Color(.05f,.65f,1),1.25f+rank*.1f,worldCamera);}if(evolved){Enemy t=NearestEnemy();if(t!=null){Hit(t,damage*2.2f);AbilityVfxController.SpawnLightning(player.transform.position,t.go.transform.position,Color.white,worldCamera);AbilityVfxController.SpawnImpactBurst(t.go.transform.position,Color.white,1.5f,worldCamera);}}abilityTimers[slot]=Mathf.Max(.65f,1.8f-rank*.14f);}
                 else if(slot==3){Enemy t=NearestEnemy();if(t!=null){Vector3 hit=t.go.transform.position;AbilityVfxController.SpawnLightning(player.transform.position,hit,Color.white,worldCamera);AbilityVfxController.SpawnImpactBurst(hit,new Color(.2f,.78f,1),1.45f+rank*.08f,worldCamera);Hit(t,damage*(1.1f+rank*.2f));DamageRadius(hit,1.25f+rank*.12f,damage*(.3f+rank*.06f));}abilityTimers[slot]=Mathf.Max(2.6f,5.8f-rank*.34f);}
-                else{int count=5+rank;AbilityVfxController.SpawnBladeWheel(player.transform.position,new Color(.22f,.72f,1),2.15f+rank*.1f,worldCamera);RadialShots(player.transform.position,count,damage*(.42f+rank*.07f),new Color(.22f,.72f,1));invulnerableTimer=Mathf.Max(invulnerableTimer,.15f+rank*.04f);if(evolved)DamageRadius(player.transform.position,3.2f,damage*1.3f);abilityTimers[slot]=Mathf.Max(4.2f,8.5f-rank*.42f);}
+                else{int count=5+rank;AbilityVfxController.SpawnLightningFan(player.transform.position,count,new Color(.22f,.72f,1),2.15f+rank*.1f,worldCamera);RadialShots(player.transform.position,count,damage*(.42f+rank*.07f),new Color(.22f,.72f,1),ProjectileVisual.ElectricBolt);invulnerableTimer=Mathf.Max(invulnerableTimer,.15f+rank*.04f);if(evolved)DamageRadius(player.transform.position,3.2f,damage*1.3f);abilityTimers[slot]=Mathf.Max(4.2f,8.5f-rank*.42f);}
             }
             TryFamiliarEcho(slot);
         }
         private static string AbilityName(HeroKind kind,int slot)
         {
-            if(kind==HeroKind.Amelia)return new[]{"Священный круг","Кнут света","Светилище","Солнечные стрелы","Завет хранителя"}[slot];
-            if(kind==HeroKind.Sam)return new[]{"Круговой удар посохом","Импульс смерти","Кровавая орбита","Жатва душ","Погребальный залп"}[slot];
-            return new[]{"Цепная молния","Молниеносный шаг","Грозовой след","Громовой приговор","Штормовой веер"}[slot];
+            if(kind==HeroKind.Amelia)return GameLocalization.Tr(new[]{"Священный круг","Кнут света","Святилище","Солнечные стрелы","Завет хранителя"}[slot]);
+            if(kind==HeroKind.Sam)return GameLocalization.Tr(new[]{"Круговой удар посохом","Импульс смерти","Кровавая орбита","Жатва душ","Погребальный залп"}[slot]);
+            return GameLocalization.Tr(new[]{"Цепная молния","Молниеносный шаг","Грозовой след","Громовой приговор","Штормовой веер"}[slot]);
         }
         private static string AbilityDescription(HeroKind kind,int slot)
         {
-            if(kind==HeroKind.Amelia)return new[]{"Круг света наносит урон и лечит Амелию.","Световой кнут поражает несколько ближайших целей.","Лечение и короткая неуязвимость.","Выпускает веер священных лучей.","Защитный завет обжигает врагов и лечит Амелию."}[slot];
-            if(kind==HeroKind.Sam)return new[]{"Удар вокруг Сэма наносит урон и похищает здоровье.","Посох выпускает мощные пробивающие заряды.","Веер тёмных зарядов лечит Сэма.","Жатва вокруг Сэма вытягивает здоровье врагов.","Плотный веер погребальных зарядов."}[slot];
-            return new[]{"Молния перескакивает между ближайшими врагами.","Зик исчезает, неуязвим и наносит два разреза.","Движение создаёт электрические импульсы.","Молния взрывает выбранную цель.","Круговой залп молний даёт короткую защиту."}[slot];
+            if(kind==HeroKind.Amelia)return GameLocalization.Tr(new[]{"Круг света наносит урон и лечит Амелию.","Световой кнут поражает несколько ближайших целей.","Лечение и короткая неуязвимость.","Выпускает веер священных лучей.","Защитный завет обжигает врагов и лечит Амелию."}[slot]);
+            if(kind==HeroKind.Sam)return GameLocalization.Tr(new[]{"Удар вокруг Сэма наносит урон и похищает здоровье.","Посох выпускает мощные пробивающие заряды.","Веер тёмных зарядов лечит Сэма.","Жатва вокруг Сэма вытягивает здоровье врагов.","Плотный веер погребальных зарядов."}[slot]);
+            return GameLocalization.Tr(new[]{"Молния перескакивает между ближайшими врагами.","Зик исчезает, становится неуязвимым и наносит два разреза.","Движение создаёт электрические импульсы.","Молния взрывает выбранную цель.","Круговой залп молний даёт короткую защиту."}[slot]);
         }
         private static Color AbilityColor(HeroKind kind)=>kind==HeroKind.Amelia?new Color(1,.82f,.3f):kind==HeroKind.Sam?new Color(.78f,.03f,.17f):new Color(.15f,.82f,1);
         private static string HeroAbilitiesSummary(HeroKind kind)
@@ -354,22 +384,25 @@ namespace Nightfall.UnityMvp
         }
         private static string HeroAbilitiesCardSummary(HeroKind kind)
         {
-            if(kind==HeroKind.Amelia)return "Священный круг — урон и лечение\nКнут света — несколько целей\nСветилище — лечение и защита\nСолнечные стрелы — веер лучей\nЗавет хранителя — щит и лечение";
-            if(kind==HeroKind.Sam)return "Удар посохом — круговой урон\nИмпульс смерти — пробивающий заряд\nКровавая орбита — веер и лечение\nЖатва душ — вампиризм вокруг\nПогребальный залп — плотный веер";
-            return "Цепная молния — скачет по целям\nМолниеносный шаг — рывок и защита\nГрозовой след — импульсы в движении\nГромовой приговор — взрыв цели\nШтормовой веер — залп и защита";
+            if(GameLocalization.Current==GameLanguage.English){if(kind==HeroKind.Amelia)return "Sacred Circle — damage and healing\nLight Whip — multiple targets\nSanctuary — healing and protection\nSolar Arrows — fan of rays\nGuardian's Covenant — shield and healing";if(kind==HeroKind.Sam)return "Staff Sweep — radial damage\nDeath Pulse — piercing bolt\nBlood Orbit — volley and healing\nSoul Harvest — area lifesteal\nFuneral Volley — dense barrage";return "Chain Lightning — jumps between targets\nLightning Step — dash and protection\nStorm Trail — pulses while moving\nThunder Judgment — target explosion\nStorm Fan — volley and protection";}
+            if(GameLocalization.Current==GameLanguage.Chinese){if(kind==HeroKind.Amelia)return "神圣之环 — 伤害与治疗\n圣光之鞭 — 多目标攻击\n圣所 — 治疗与保护\n太阳箭雨 — 扇形光束\n守护者盟约 — 护盾与治疗";if(kind==HeroKind.Sam)return "法杖横扫 — 范围伤害\n死亡脉冲 — 穿透弹\n血色轨道 — 齐射与治疗\n灵魂收割 — 范围吸血\n葬礼齐射 — 密集弹幕";return "连锁闪电 — 目标间跳跃\n雷霆步 — 冲刺与保护\n风暴轨迹 — 移动脉冲\n雷霆审判 — 引爆目标\n风暴扇击 — 齐射与保护";}
+            if(kind==HeroKind.Amelia)return "Священный круг — урон и лечение\nКнут света — несколько целей\nСвятилище — лечение и защита\nСолнечные стрелы — веер лучей\nЗавет хранителя — щит и лечение";if(kind==HeroKind.Sam)return "Удар посохом — круговой урон\nИмпульс смерти — пробивающий заряд\nКровавая орбита — веер и лечение\nЖатва душ — вампиризм вокруг\nПогребальный залп — плотный веер";return "Цепная молния — скачет по целям\nМолниеносный шаг — рывок и защита\nГрозовой след — импульсы в движении\nГромовой приговор — взрыв цели\nШтормовой веер — залп и защита";
         }
         private Enemy NearestTo(Vector3 point,Enemy excluded){Enemy result=null;float best=16;foreach(var e in enemies){if(!e.active||e==excluded)continue;float d=(e.go.transform.position-point).sqrMagnitude;if(d<best){best=d;result=e;}}return result;}
 
-        private void SpawnProjectile(Vector3 pos,Vector3 dir,float amount,float speed,bool hostile,Color color)
-        {foreach(var p in projectiles){if(p.active)continue;p.active=true;p.hostile=hostile;p.damage=amount;p.life=2.2f;p.radius=.46f;p.phase=Random.value*Mathf.PI*2;p.hitsRemaining=hostile?1:pierce;p.lastHit=null;p.velocity=dir.normalized*speed;p.go.transform.position=pos;p.go.transform.rotation=worldCamera.transform.rotation;p.go.GetComponent<SpriteRenderer>().color=color;p.go.SetActive(true);return;}}
+        private void SpawnProjectile(Vector3 pos,Vector3 dir,float amount,float speed,bool hostile,Color color,ProjectileVisual visual=ProjectileVisual.Orb)
+        {foreach(var p in projectiles){if(p.active)continue;p.active=true;p.hostile=hostile;p.damage=amount;p.life=2.2f;p.radius=visual==ProjectileVisual.SwordWave?.62f:visual==ProjectileVisual.SolarArrow||visual==ProjectileVisual.DeathShard?.30f:.42f;p.phase=Random.value*Mathf.PI*2;p.hitsRemaining=hostile?1:pierce;p.lastHit=null;p.lastChest=null;p.velocity=dir.normalized*speed;p.visual=visual;p.go.transform.position=pos;var renderer=p.go.GetComponent<SpriteRenderer>();renderer.sprite=ProjectileSprite(visual);renderer.color=color;p.go.SetActive(true);OrientProjectile(p);return;}}
+        private Sprite ProjectileSprite(ProjectileVisual visual){if(visual==ProjectileVisual.SolarArrow)return solarArrowSprite;if(visual==ProjectileVisual.DeathShard)return deathShardSprite;if(visual==ProjectileVisual.BloodNeedle)return bloodNeedleSprite;if(visual==ProjectileVisual.ElectricBolt)return electricBoltSprite;if(visual==ProjectileVisual.SwordWave)return swordWaveSprite;return projectileOrbSprite;}
+        private void OrientProjectile(Projectile p){float angle=Mathf.Atan2(p.velocity.z,p.velocity.x)*Mathf.Rad2Deg;p.go.transform.rotation=worldCamera.transform.rotation*Quaternion.Euler(0,0,angle);float pulse=1+Mathf.Sin(p.phase)*.06f;p.go.transform.localScale=p.visual==ProjectileVisual.Orb?Vector3.one*(.66f*pulse):p.visual==ProjectileVisual.SwordWave?new Vector3(1.55f*pulse,1.12f,1):new Vector3(.95f*pulse,.52f,1);}
         private void UpdateProjectiles(float dt)
         {
             foreach(var p in projectiles)
             {
-                if(!p.active)continue;p.phase+=dt*10;float projectileScale=.68f+Mathf.Sin(p.phase)*.10f;p.go.transform.localScale=Vector3.one*projectileScale;p.go.transform.rotation=worldCamera.transform.rotation*Quaternion.Euler(0,0,p.phase*22);Vector3 from=p.go.transform.position;Vector3 to=from+p.velocity*dt;p.go.transform.position=to;p.life-=dt;bool consumed=p.life<=0;
+                if(!p.active)continue;p.phase+=dt*10;OrientProjectile(p);Vector3 from=p.go.transform.position;Vector3 to=from+p.velocity*dt;p.go.transform.position=to;p.life-=dt;bool consumed=p.life<=0;
                 if(!consumed&&p.hostile&&SegmentHitsXZ(from,to,player.transform.position,p.radius+.45f)){DamagePlayer(p.damage);consumed=true;}
+                if(!consumed&&!p.hostile)foreach(var chest in chests){if(!chest.active||chest==p.lastChest||!SegmentHitsXZ(from,to,chest.go.transform.position,p.radius+.72f))continue;DamageChest(chest);p.lastChest=chest;p.hitsRemaining--;consumed=p.hitsRemaining<=0;if(consumed)break;}
                 if(!consumed&&!p.hostile)foreach(var e in enemies){if(!e.active||e==p.lastHit)continue;float hitRadius=p.radius+(e.IsBoss?.85f:.48f);if(!SegmentHitsXZ(from,to,e.go.transform.position,hitRadius))continue;float dealt=p.damage*(Random.value<critChance?2:1);Hit(e,dealt);p.lastHit=e;p.hitsRemaining--;consumed=p.hitsRemaining<=0;if(consumed)break;}
-                if(consumed){p.active=false;p.go.SetActive(false);}
+                if(consumed){if(p.life>0&&!p.hostile){float size=p.visual==ProjectileVisual.SolarArrow?.58f:p.visual==ProjectileVisual.ElectricBolt||p.visual==ProjectileVisual.SwordWave?.72f:.48f;AbilityVfxController.SpawnProjectileImpact(p.go.transform.position,p.color,p.visual==ProjectileVisual.ElectricBolt||p.visual==ProjectileVisual.SwordWave?2:p.visual==ProjectileVisual.DeathShard||p.visual==ProjectileVisual.BloodNeedle?1:0,size,worldCamera);}p.active=false;p.go.SetActive(false);}
             }
         }
         private static bool SegmentHitsXZ(Vector3 from,Vector3 to,Vector3 point,float radius)
@@ -384,48 +417,76 @@ namespace Nightfall.UnityMvp
         private void Kill(Enemy e)
         {
             bool boss=e.IsBoss;Vector3 pos=e.go.transform.position;e.active=false;e.go.SetActive(false);kills++;SpawnOrb(pos,boss?12:e.def.kind==EnemyKind.Mutant?3:1);
-            if(!boss&&LootDropTable.Roll(LootKind.Treat,!petUnlocked&&!petUnlockPending))SpawnLoot(pos,LootKind.Treat);
+            if(!boss&&LootDropTable.Roll(LootKind.Treat,!petUnlockPending&&(!petUnlocked||petLevel<PetCatalog.MaxLevel),petUnlocked))SpawnLoot(pos,LootKind.Treat);
             if(!boss&&e.def.kind==EnemyKind.Possessed&&Random.value<.22f){DamageRadius(pos,1.45f,damage*.55f);Pulse(pos,new Color(.7f,.12f,.8f),1.45f);}
             if(boss){currentBoss=null;bossIndex++;bossSpawnedForStage=false;if(bossIndex>=3)state=State.Victory;}
         }
         private void SpawnOrb(Vector3 pos,int value){foreach(var o in orbs){if(o.active)continue;o.active=true;o.value=value;o.go.transform.position=pos+Vector3.up*.12f;o.go.SetActive(true);return;}}
         private void UpdateOrbs(float dt)
-        {foreach(var o in orbs){if(!o.active)continue;o.phase+=dt*3.2f;float pulse=.48f+Mathf.Sin(o.phase)*.06f+(o.value>1?.10f:0);o.go.transform.localScale=Vector3.one*pulse;o.go.transform.rotation=worldCamera.transform.rotation*Quaternion.Euler(0,0,Time.time*38+o.phase*18);Vector3 delta=player.transform.position-o.go.transform.position;float d=delta.magnitude;if(d<magnet)o.go.transform.position+=delta.normalized*Mathf.Lerp(3,12,1-d/magnet)*dt;if(d<.45f){o.active=false;o.go.SetActive(false);AddXp(o.value);}}}
+        {foreach(var o in orbs){if(!o.active)continue;o.phase+=dt*3.2f;float pulse=.48f+Mathf.Sin(o.phase)*.06f+(o.value>1?.10f:0);o.go.transform.localScale=Vector3.one*pulse;o.go.transform.rotation=worldCamera.transform.rotation*Quaternion.Euler(0,0,Time.time*38+o.phase*18);Vector3 delta=player.transform.position-o.go.transform.position;float d=delta.magnitude;if(globalMagnetTimer>0)o.go.transform.position+=delta.normalized*Mathf.Min(48,12+d*1.4f)*dt;else if(d<magnet)o.go.transform.position+=delta.normalized*Mathf.Lerp(3,12,1-d/magnet)*dt;if(d<.45f){o.active=false;o.go.SetActive(false);AddXp(o.value);}}}
         private void SpawnLoot(Vector3 pos,LootKind kind){foreach(var loot in lootPickups){if(loot.active)continue;loot.active=true;loot.kind=kind;loot.go.transform.position=pos+Vector3.up*.15f;loot.go.SetActive(true);return;}}
         private void UpdateLoot(float dt)
         {
-            foreach(var loot in lootPickups){if(!loot.active)continue;loot.phase+=dt*4;loot.go.transform.localScale=Vector3.one*(.56f+Mathf.Sin(loot.phase)*.07f);loot.go.transform.rotation=worldCamera.transform.rotation*Quaternion.Euler(0,0,Mathf.Sin(loot.phase)*12);Vector3 delta=player.transform.position-loot.go.transform.position;float distance=delta.magnitude;if(distance<1.35f)loot.go.transform.position+=delta.normalized*7*dt;if(distance>=.48f)continue;loot.active=false;loot.go.SetActive(false);if(loot.kind==LootKind.Treat){treatsCollected=Mathf.Min(3,treatsCollected+1);if(treatsCollected>=3){petUnlockPending=true;foreach(var other in lootPickups){other.active=false;other.go.SetActive(false);}state=State.PetUnlock;}}}
+            foreach(var loot in lootPickups){if(!loot.active)continue;loot.phase+=dt*4;loot.go.transform.localScale=Vector3.one*(.56f+Mathf.Sin(loot.phase)*.07f);loot.go.transform.rotation=worldCamera.transform.rotation*Quaternion.Euler(0,0,Mathf.Sin(loot.phase)*12);Vector3 delta=player.transform.position-loot.go.transform.position;float distance=delta.magnitude;if(distance<1.35f)loot.go.transform.position+=delta.normalized*7*dt;if(distance>=.48f)continue;loot.active=false;loot.go.SetActive(false);if(loot.kind==LootKind.Treat){if(petUnlocked&&petLevel>=PetCatalog.MaxLevel)continue;treatsCollected++;if(treatsCollected<3)continue;if(!petUnlocked){treatsCollected=3;petUnlockPending=true;foreach(var other in lootPickups){other.active=false;other.go.SetActive(false);}state=State.PetUnlock;}else{treatsCollected=0;petLevel=Mathf.Min(PetCatalog.MaxLevel,petLevel+1);abilityFlash=PetLevelUpText();abilityFlashTimer=1.35f;abilityFlashColor=AbilityColor(hero.kind);abilityFlashSlot=-2;if(petController!=null){Pulse(petController.transform.position,abilityFlashColor,1.9f);CombatVfxPool.SpawnRing(petController.transform.position,Color.white,1.25f,worldCamera,.55f);}}}}
+        }
+        private void TrySpawnChest()
+        {
+            int active=0;foreach(var chest in chests)if(chest.active)active++;if(active>=2)return;Chest free=null;foreach(var chest in chests)if(!chest.active){free=chest;break;}if(free==null)return;
+            for(int attempt=0;attempt<28;attempt++)
+            {
+                float angle=Random.value*Mathf.PI*2,distance=Random.Range(11f,19f);Vector3 pos=player.transform.position+new Vector3(Mathf.Cos(angle)*distance,.03f,Mathf.Sin(angle)*distance);
+                pos.x=Mathf.Clamp(pos.x,-35f,35f);pos.z=Mathf.Clamp(pos.z,-19f,19f);bool clear=true;for(int i=0;i<obstaclePositions.Count;i++)if((obstaclePositions[i]-pos).sqrMagnitude<Mathf.Pow(obstacleRadii[i]+1.25f,2)){clear=false;break;}foreach(var other in chests)if(other.active&&(other.go.transform.position-pos).sqrMagnitude<36)clear=false;if(!clear)continue;
+                free.active=true;free.hits=0;free.phase=Random.value*Mathf.PI*2;free.go.transform.position=pos;free.go.transform.rotation=worldCamera.transform.rotation;free.go.transform.localScale=Vector3.one*1.05f;free.go.SetActive(true);CombatVfxPool.SpawnRing(pos,new Color(.18f,.82f,.92f),1.25f,worldCamera,.65f);return;
+            }
+        }
+        private void DamageChest(Chest chest)
+        {
+            if(chest==null||!chest.active)return;chest.hits++;float remaining=4-chest.hits;AbilityVfxController.SpawnProjectileImpact(chest.go.transform.position,remaining<=0?new Color(1,.78f,.24f):new Color(.2f,.85f,1),0,.58f,worldCamera);chest.go.transform.localScale=Vector3.one*(1.05f+chest.hits*.045f);if(chest.hits<4)return;
+            Vector3 pos=chest.go.transform.position;chest.active=false;chest.go.SetActive(false);CombatVfxPool.SpawnRing(pos,new Color(1,.72f,.22f),1.8f,worldCamera,.68f);SpawnChestReward(pos);
+        }
+        private void SpawnChestReward(Vector3 pos)
+        {
+            ChestReward free=null;foreach(var reward in chestRewards)if(!reward.active){free=reward;break;}if(free==null)return;float roll=Random.value;free.kind=roll<.40f?ChestRewardKind.Healing:roll<.75f?ChestRewardKind.ExperienceCache:ChestRewardKind.MagnetIdol;free.active=true;free.phase=Random.value*Mathf.PI*2;free.go.GetComponent<SpriteRenderer>().sprite=ChestRewardSprite(free.kind);free.go.transform.position=pos+Vector3.up*.15f;free.go.SetActive(true);
+        }
+        private void UpdateChests(float dt){foreach(var chest in chests){if(!chest.active)continue;chest.phase+=dt*2.2f;float pulse=1.02f+Mathf.Sin(chest.phase)*.035f;chest.go.transform.rotation=worldCamera.transform.rotation*Quaternion.Euler(0,0,Mathf.Sin(chest.phase*.7f)*1.8f);chest.go.transform.localScale=Vector3.one*pulse;}}
+        private void UpdateChestRewards(float dt)
+        {
+            foreach(var reward in chestRewards){if(!reward.active)continue;reward.phase+=dt*3.5f;reward.go.transform.rotation=worldCamera.transform.rotation*Quaternion.Euler(0,0,Mathf.Sin(reward.phase)*8);reward.go.transform.localScale=Vector3.one*(.82f+Mathf.Sin(reward.phase)*.07f);Vector3 delta=player.transform.position-reward.go.transform.position;if(delta.sqrMagnitude>.55f*.55f)continue;reward.active=false;reward.go.SetActive(false);if(reward.kind==ChestRewardKind.Healing){float restored=maxHp*.30f;hp=Mathf.Min(maxHp,hp+restored);abilityFlash=GameLocalization.Current==GameLanguage.Russian?"ЛЕЧЕНИЕ +30%":GameLocalization.Current==GameLanguage.English?"HEALING +30%":"治疗 +30%";abilityFlashColor=new Color(1,.25f,.28f);}else if(reward.kind==ChestRewardKind.ExperienceCache){AddXp(5);abilityFlash=GameLocalization.Current==GameLanguage.Russian?"СФЕРА ОПЫТА ×5":GameLocalization.Current==GameLanguage.English?"XP ORB ×5":"经验球 ×5";abilityFlashColor=new Color(.15f,1,.86f);}else{globalMagnetTimer=6f;abilityFlash=GameLocalization.Current==GameLanguage.Russian?"ВСЕ СФЕРЫ ПРИТЯНУТЫ":GameLocalization.Current==GameLanguage.English?"ALL ORBS ATTRACTED":"吸引所有经验球";abilityFlashColor=new Color(.72f,.38f,1);}abilityFlashTimer=1.25f;abilityFlashSlot=-1;CombatVfxPool.SpawnRing(player.transform.position,abilityFlashColor,1.65f,worldCamera,.58f);}
         }
         private void UnlockPet()
         {
             if(petUnlocked&&petController!=null&&petController.GetComponent<SpriteRenderer>()!=null){state=State.Playing;return;}
-            petUnlockPending=false;petUnlocked=true;petDefinition=PetCatalog.ForOwner(hero.id);petPortrait=Resources.Load<Texture2D>(petDefinition.portraitResource);
+            petUnlockPending=false;petUnlocked=true;petLevel=Mathf.Max(1,petLevel);treatsCollected=0;petDefinition=PetCatalog.ForOwner(hero.id);petPortrait=Resources.Load<Texture2D>(petDefinition.portraitResource);
             if(petObject!=null)Destroy(petObject);
             petObject=new GameObject("Pet_"+petDefinition.id);petObject.transform.position=player.transform.position+new Vector3(-1.2f,.05f,-.2f);petController=petObject.AddComponent<PetController>();
-            Texture2D texture=Resources.Load<Texture2D>(petDefinition.spriteResource);if(texture==null)Debug.LogError("PET_SPRITE_MISSING "+petDefinition.spriteResource);Sprite sprite=texture!=null?Sprite.Create(texture,new Rect(0,0,texture.width,texture.height),new Vector2(.5f,.18f),48,0,SpriteMeshType.FullRect):CreateTreatSprite();
+            Texture2D texture=Resources.Load<Texture2D>(petDefinition.spriteResource);if(texture==null)Debug.LogError("PET_SPRITE_MISSING "+petDefinition.spriteResource);Sprite sprite=texture!=null?Sprite.Create(texture,new Rect(0,0,texture.width,texture.height),new Vector2(.5f,.18f),48,0,SpriteMeshType.FullRect):CreateTreatSprite();petNotificationSprite=sprite;
             petController.Configure(petDefinition,player.transform,sprite,worldCamera);state=State.Playing;
         }
         private void QaUnlockPet()
         {
-            if(petObject!=null)Destroy(petObject);petObject=null;petController=null;petUnlocked=false;petDefinition=PetCatalog.ForOwner(hero.id);petPortrait=Resources.Load<Texture2D>(petDefinition.portraitResource);petUnlockPending=true;state=State.PetUnlock;
+            if(petObject!=null)Destroy(petObject);petObject=null;petController=null;petNotificationSprite=null;petUnlocked=false;petLevel=0;treatsCollected=0;petDefinition=PetCatalog.ForOwner(hero.id);petPortrait=Resources.Load<Texture2D>(petDefinition.portraitResource);petUnlockPending=true;state=State.PetUnlock;
         }
         private void UpdatePet(float dt)
         {
             if(!petUnlocked||petController==null)return;petController.TickMovement(dt);petController.AttackClock-=dt;if(petController.AttackClock>0)return;
             Enemy target=NearestToPet(petController.transform.position,petDefinition.targetingRange);if(target==null)return;Vector3 from=petController.transform.position+Vector3.up*.25f,dir=(target.go.transform.position-from).normalized;
-            petController.PlayAttack();SpawnProjectile(from,dir,damage*petDefinition.attackDamageMultiplier,8.5f,false,AbilityColor(hero.kind));CombatVfxPool.SpawnAttack(from,dir,AbilityColor(hero.kind),3,worldCamera);petController.AttackClock=petDefinition.attackCooldown;
+            petController.PlayAttack();SpawnProjectile(from,dir,damage*petDefinition.attackDamageMultiplier*PetDamageScale(),8.5f,false,AbilityColor(hero.kind));CombatVfxPool.SpawnAttack(from,dir,AbilityColor(hero.kind),3,worldCamera);petController.AttackClock=petDefinition.attackCooldown;
         }
         private Enemy NearestToPet(Vector3 point,float range){Enemy result=null;float best=range*range;foreach(var e in enemies){if(!e.active)continue;float d=(e.go.transform.position-point).sqrMagnitude;if(d<best){best=d;result=e;}}return result;}
         private void TryFamiliarEcho(int slot)
         {
             if(!petUnlocked||petController==null||!familiarEcho.TryBegin(petDefinition,true))return;
-            Vector3 origin=petController.transform.position+Vector3.up*.25f;Enemy target=NearestToPet(origin,petDefinition.targetingRange);if(target!=null){Color color=AbilityColor(hero.kind);Vector3 hit=target.go.transform.position;AbilityVfxController.SpawnLightning(origin,hit,new Color(color.r,color.g,color.b,.9f),worldCamera);AbilityVfxController.SpawnImpactBurst(hit,color,1.1f+slot*.06f,worldCamera);Hit(target,damage*(.45f+abilityRanks[slot]*.08f));}
+            Vector3 origin=petController.transform.position+Vector3.up*.25f;Enemy target=NearestToPet(origin,petDefinition.targetingRange);if(target!=null){Color color=AbilityColor(hero.kind);Vector3 hit=target.go.transform.position,dir=(hit-origin).normalized;float echoDamage=damage*(.45f+abilityRanks[slot]*.08f)*PetDamageScale();if(hero.kind==HeroKind.Amelia){if(slot==3)SpawnProjectile(origin,dir,echoDamage,11,false,new Color(1,.92f,.58f),ProjectileVisual.SolarArrow);else if(slot==1)AbilityVfxController.SpawnWhip(origin,hit,color,worldCamera);else AbilityVfxController.SpawnBeam(origin,hit,color,worldCamera);}else if(hero.kind==HeroKind.Sam){if(slot==0||slot==3)AbilityVfxController.SpawnSoulDrain(hit,origin,color,1.2f,worldCamera);else SpawnProjectile(origin,dir,echoDamage,9,false,color,slot==2?ProjectileVisual.BloodNeedle:ProjectileVisual.DeathShard);}else AbilityVfxController.SpawnLightning(origin,hit,new Color(color.r,color.g,color.b,.9f),worldCamera);if(!(hero.kind==HeroKind.Amelia&&slot==3)&&!(hero.kind==HeroKind.Sam&&(slot==1||slot==2||slot==4)))Hit(target,echoDamage);AbilityVfxController.SpawnProjectileImpact(hit,color,hero.kind==HeroKind.Zike?2:hero.kind==HeroKind.Sam?1:0,.72f,worldCamera);}
             familiarEcho.End();
         }
+        private void QaPreviewNextAbility(){if(state!=State.Playing)return;int slot=qaVfxSlot%5;abilityRanks[slot]=Mathf.Max(3,abilityRanks[slot]);abilityTimers[slot]=0;CastHeroAbility(slot);qaVfxSlot=(slot+1)%5;}
+        private float PetDamageScale()=>1+Mathf.Min(PetCatalog.MaxLevel-1,Mathf.Max(0,petLevel-1))*PetCatalog.DamageBonusPerLevel;
+        private string PetLevelUpText()=>GameLocalization.Current==GameLanguage.Russian?"ФАМИЛЬЯР: УРОВЕНЬ "+petLevel:GameLocalization.Current==GameLanguage.English?"FAMILIAR: LEVEL "+petLevel:"魔宠等级 "+petLevel;
         private void AddXp(int value){xp+=value;if(xp<xpNeed)return;xp-=xpNeed;xpNeed=Mathf.CeilToInt(xpNeed*1.28f+2);level++;RollUpgrades();state=State.Upgrade;}
         private void DamagePlayer(float amount){if(qaInvulnerable||invulnerableTimer>0)return;hp-=amount;if(hp<=0){hp=0;state=State.Dead;}}
 
-        private void RadialShots(Vector3 pos,int count,float amount,Color color){bool hostile=(pos-player.transform.position).sqrMagnitude>.1f;for(int i=0;i<count;i++){float a=i*Mathf.PI*2/count;SpawnProjectile(pos,new Vector3(Mathf.Cos(a),0,Mathf.Sin(a)),amount,hostile?5.5f:7,hostile,color);}}
+        private void RadialShots(Vector3 pos,int count,float amount,Color color,ProjectileVisual visual=ProjectileVisual.Orb){bool hostile=(pos-player.transform.position).sqrMagnitude>.1f;for(int i=0;i<count;i++){float a=i*Mathf.PI*2/count;SpawnProjectile(pos,new Vector3(Mathf.Cos(a),0,Mathf.Sin(a)),amount,hostile?5.5f:7,hostile,color,visual);}}
+        private void FanShots(Vector3 pos,Vector3 forward,int count,float amount,Color color,ProjectileVisual visual){float spread=Mathf.Min(48,10*(count-1));for(int i=0;i<count;i++){float angle=count==1?0:Mathf.Lerp(-spread*.5f,spread*.5f,i/(float)(count-1));SpawnProjectile(pos+Vector3.up*.45f,Quaternion.Euler(0,angle,0)*forward,amount,visual==ProjectileVisual.SolarArrow?11:9,false,color,visual);}}
         private void Pulse(Vector3 pos,Color color,float scale){CombatVfxPool.SpawnRing(pos,color,scale,worldCamera);}
         private void AbilityBurst(Vector3 pos,Color color,int style){if(style==0)AbilityVfxController.SpawnRuneBloom(pos,color,2.15f,worldCamera);else if(style==1)AbilityVfxController.SpawnBladeWheel(pos,color,2.15f,worldCamera);else AbilityVfxController.SpawnImpactBurst(pos,color,2.15f,worldCamera);CombatVfxPool.SpawnRing(pos,color,2.5f,worldCamera,.78f);for(int i=0;i<8;i++){float a=i*Mathf.PI*2/8;CombatVfxPool.SpawnAttack(pos,new Vector3(Mathf.Cos(a),0,Mathf.Sin(a)),color,style,worldCamera);}}
 
@@ -434,7 +495,7 @@ namespace Nightfall.UnityMvp
             BuildFilteredUpgrades();
             return;
             upgrades.Add(new Upgrade{name="МОЩЬ",description="Урон +20%",apply=()=>damage*=1.2f});
-            upgrades.Add(new Upgrade{name="ТЕМП",description="Скорость атак +15%",apply=()=>attackDelay*=.85f});
+            upgrades.Add(new Upgrade{name="ТЕМП",description="Скорость атаки +15%",apply=()=>attackDelay*=.85f});
             upgrades.Add(new Upgrade{name="ДАЛЬНОСТЬ",description="Дальность +18%",apply=()=>attackRange*=1.18f});
             upgrades.Add(new Upgrade{name="СКОРОСТЬ",description="Движение +12%",apply=()=>moveSpeed*=1.12f});
             upgrades.Add(new Upgrade{name="ЖИВУЧЕСТЬ",description="Макс. HP +30",apply=()=>{maxHp+=30;hp+=30;}});
@@ -456,7 +517,7 @@ namespace Nightfall.UnityMvp
         {
             upgrades.Clear();
             upgrades.Add(new Upgrade{name="МОЩЬ",description="Урон +20%",apply=()=>damage*=1.2f});
-            upgrades.Add(new Upgrade{name="ТЕМП",description="Скорость атак +15%",apply=()=>attackDelay*=.85f});
+            upgrades.Add(new Upgrade{name="ТЕМП",description="Скорость атаки +15%",apply=()=>attackDelay*=.85f});
             upgrades.Add(new Upgrade{name="ДАЛЬНОСТЬ",description="Дальность +18%",apply=()=>attackRange*=1.18f});
             upgrades.Add(new Upgrade{name="СКОРОСТЬ",description="Движение +12%",apply=()=>moveSpeed*=1.12f});
             upgrades.Add(new Upgrade{name="ЖИВУЧЕСТЬ",description="Макс. HP +30",apply=()=>{maxHp+=30;hp+=30;}});
@@ -469,16 +530,16 @@ namespace Nightfall.UnityMvp
             for(int i=0;i<passiveIcons.Length;i++)upgrades[i].icon=passiveIcons[i];
             AddAbility(HeroKind.Amelia,0,"СВЯЩЕННЫЙ КРУГ","Световой круг наносит урон и лечит Амелию");
             AddAbility(HeroKind.Amelia,1,"КНУТ СВЕТА","Поражает несколько ближайших целей световым кнутом");
-            AddAbility(HeroKind.Amelia,2,"СВЕТИЛИЩЕ","Лечение и короткая божественная защита");
+            AddAbility(HeroKind.Amelia,2,"СВЯТИЛИЩЕ","Лечение и кратковременная божественная защита");
             AddAbility(HeroKind.Amelia,3,"СОЛНЕЧНЫЕ СТРЕЛЫ","Веер золотых священных лучей");
             AddAbility(HeroKind.Amelia,4,"ЗАВЕТ ХРАНИТЕЛЯ","Защитный круг обжигает врагов и лечит Амелию");
             AddAbility(HeroKind.Sam,0,"КРУГОВОЙ УДАР ПОСОХОМ","Удар вокруг Сэма с похищением здоровья");
-            AddAbility(HeroKind.Sam,1,"ИМПУЛЬС СМЕРТИ","Мощные пробивающие заряды через посох");
+            AddAbility(HeroKind.Sam,1,"ИМПУЛЬС СМЕРТИ","Посох выпускает мощные пробивающие заряды");
             AddAbility(HeroKind.Sam,2,"КРОВАВАЯ ОРБИТА","Веер тёмных зарядов и восстановление здоровья");
             AddAbility(HeroKind.Sam,3,"ЖАТВА ДУШ","Круговая жатва наносит урон и похищает здоровье");
             AddAbility(HeroKind.Sam,4,"ПОГРЕБАЛЬНЫЙ ЗАЛП","Плотный веер тёмно-красных зарядов");
             AddAbility(HeroKind.Zike,0,"ЦЕПНАЯ МОЛНИЯ","Молния перескакивает между противниками");
-            AddAbility(HeroKind.Zike,1,"МОЛНИЕНОСНЫЙ ШАГ","Зик исчезает, неуязвим и наносит два разреза");
+            AddAbility(HeroKind.Zike,1,"МОЛНИЕНОСНЫЙ ШАГ","Зик исчезает, становится неуязвимым и наносит два разреза");
             AddAbility(HeroKind.Zike,2,"ГРОЗОВОЙ СЛЕД","Движение оставляет электрические импульсы");
             AddAbility(HeroKind.Zike,3,"ГРОМОВОЙ ПРИГОВОР","Молния поражает цель и взрывается вокруг неё");
             AddAbility(HeroKind.Zike,4,"ШТОРМОВОЙ ВЕЕР","Круговой залп молний даёт короткую защиту");
@@ -501,10 +562,10 @@ namespace Nightfall.UnityMvp
         private void StartRun()
         {
             maxHp=hero.hp;hp=maxHp;damage=hero.damage;attackDelay=hero.attackDelay;moveSpeed=hero.speed;attackRange=10;critChance=.05f;magnet=2.8f;regen=0;projectileCount=1;pierce=1;
-            level=1;xp=0;xpNeed=10;kills=0;runTime=0;spawnClock=.65f;attackClock=.4f;uniqueClock=4;bossIndex=0;bossSpawnedForStage=false;currentBoss=null;suppressionMultiplier=1;invulnerableTimer=0;zikeVanishTimer=0;characterVisual.SetVisible(true);
-            for(int i=0;i<5;i++){abilityRanks[i]=0;abilityTimers[i]=0;}passiveRanks.Clear();treatsCollected=0;petUnlocked=false;petUnlockPending=false;petDefinition=PetCatalog.ForOwner(hero.id);petPortrait=Resources.Load<Texture2D>(petDefinition.portraitResource);if(petObject!=null)Destroy(petObject);petObject=null;petController=null;
+            level=1;xp=0;xpNeed=10;kills=0;runTime=0;spawnClock=.65f;attackClock=.4f;uniqueClock=4;chestSpawnClock=Random.Range(22f,34f);globalMagnetTimer=0;bossIndex=0;bossSpawnedForStage=false;currentBoss=null;suppressionMultiplier=1;invulnerableTimer=0;zikeVanishTimer=0;characterVisual.SetVisible(true);
+            for(int i=0;i<5;i++){abilityRanks[i]=0;abilityTimers[i]=0;}passiveRanks.Clear();treatsCollected=0;petLevel=0;petUnlocked=false;petUnlockPending=false;petDefinition=PetCatalog.ForOwner(hero.id);petPortrait=Resources.Load<Texture2D>(petDefinition.portraitResource);if(petObject!=null)Destroy(petObject);petObject=null;petController=null;petNotificationSprite=null;
             var pool=new[]{BossKind.EarthDragon,BossKind.Assassin,BossKind.EliteAgent,BossKind.BastionMech};for(int i=0;i<pool.Length;i++){int j=Random.Range(i,pool.Length);(pool[i],pool[j])=(pool[j],pool[i]);}for(int i=0;i<3;i++)selectedBosses[i]=pool[i];
-            foreach(var e in enemies){e.active=false;e.go.SetActive(false);}foreach(var p in projectiles){p.active=false;p.go.SetActive(false);}foreach(var o in orbs){o.active=false;o.go.SetActive(false);}foreach(var loot in lootPickups){loot.active=false;loot.go.SetActive(false);}
+            foreach(var e in enemies){e.active=false;e.go.SetActive(false);}foreach(var p in projectiles){p.active=false;p.go.SetActive(false);}foreach(var o in orbs){o.active=false;o.go.SetActive(false);}foreach(var loot in lootPickups){loot.active=false;loot.go.SetActive(false);}foreach(var chest in chests){chest.active=false;chest.go.SetActive(false);}foreach(var reward in chestRewards){reward.active=false;reward.go.SetActive(false);}
             ApplyRandomMap();player.transform.position=Vector3.zero;player.SetActive(true);state=State.Playing;
         }
 
@@ -635,6 +696,7 @@ namespace Nightfall.UnityMvp
 
         private static Sprite CreateSolidSprite(){var t=new Texture2D(1,1,TextureFormat.RGBA32,false);t.SetPixel(0,0,Color.white);t.Apply();return Sprite.Create(t,new Rect(0,0,1,1),new Vector2(.5f,.5f),1);}
         private static Sprite CreateProjectileSprite(){const int s=32;var t=new Texture2D(s,s,TextureFormat.RGBA32,false){filterMode=FilterMode.Point,wrapMode=TextureWrapMode.Clamp};var p=new Color[s*s];for(int y=0;y<s;y++)for(int x=0;x<s;x++){float dx=Mathf.Abs(x+.5f-s*.5f),dy=Mathf.Abs(y+.5f-s*.5f),d=Mathf.Sqrt(dx*dx+dy*dy);bool ray=(dx<2&&dy<14)||(dy<2&&dx<14);Color c=Color.clear;if(d<5)c=new Color(1,1,1,1);else if(d<8)c=new Color(.62f,.62f,.62f,1);else if(d<10)c=new Color(.05f,.05f,.07f,1);else if(ray)c=new Color(.82f,.82f,.82f,1);p[y*s+x]=c;}t.SetPixels(p);t.Apply(false,true);return Sprite.Create(t,new Rect(0,0,s,s),new Vector2(.5f,.5f),32);}
+        private static Sprite CreateProjectileShape(int style){const int w=64,h=24;var t=new Texture2D(w,h,TextureFormat.RGBA32,false){filterMode=FilterMode.Bilinear,wrapMode=TextureWrapMode.Clamp};var p=new Color[w*h];for(int y=0;y<h;y++)for(int x=0;x<w;x++){float nx=x/(float)(w-1),dy=Mathf.Abs(y+.5f-h*.5f);float a=0;if(style==0){float shaft=Mathf.Clamp01(1-dy/2.2f)*Mathf.SmoothStep(0,1,nx);float head=Mathf.Clamp01(1-Mathf.Abs(dy-(1-nx)*8)/2.4f)*Mathf.Clamp01((nx-.68f)*5);float tail=Mathf.Clamp01(1-Mathf.Abs(dy-(.28f-nx)*7)/2)*Mathf.Clamp01((.35f-nx)*5);a=Mathf.Max(shaft,Mathf.Max(head,tail));}else if(style==1){float blade=Mathf.Clamp01(1-dy/(2+nx*7))*Mathf.SmoothStep(0,1,nx);a=blade*Mathf.Clamp01((1.08f-nx)*12);}else if(style==2){a=Mathf.Clamp01(1-dy/(1.3f+Mathf.Sin(nx*Mathf.PI)*2.4f))*Mathf.Sin(nx*Mathf.PI);}else if(style==3){float zig=Mathf.Sin(nx*22)*3;a=Mathf.Clamp01(1-Mathf.Abs((y-h*.5f)-zig)/2.2f)*Mathf.Sin(nx*Mathf.PI);}else{float cy=(y+.5f-h*.5f)/(h*.5f),cx=(x+.5f)/(w*.92f),r=Mathf.Sqrt(cx*cx+cy*cy),arc=Mathf.Clamp01(1-Mathf.Abs(r-.82f)/.11f);a=arc*Mathf.Clamp01((cx-.08f)*5)*Mathf.Clamp01((1.04f-cx)*10);}p[y*w+x]=new Color(1,1,1,a);}t.SetPixels(p);t.Apply(false,true);return Sprite.Create(t,new Rect(0,0,w,h),new Vector2(.12f,.5f),32);}
         private static Sprite CreateExperienceSprite(){const int s=32;var t=new Texture2D(s,s,TextureFormat.RGBA32,false){filterMode=FilterMode.Point,wrapMode=TextureWrapMode.Clamp};var p=new Color[s*s];for(int y=0;y<s;y++)for(int x=0;x<s;x++){float dx=Mathf.Abs(x+.5f-s*.5f),dy=Mathf.Abs(y+.5f-s*.5f),diamond=dx+dy;Color c=Color.clear;if(diamond<7)c=new Color(1,1,1,1);else if(diamond<11)c=new Color(.62f,.62f,.62f,1);else if(diamond<14)c=new Color(.035f,.045f,.06f,1);else if(diamond<16)c=new Color(.35f,.35f,.35f,.55f);p[y*s+x]=c;}t.SetPixels(p);t.Apply(false,true);return Sprite.Create(t,new Rect(0,0,s,s),new Vector2(.5f,.5f),32);}
         private static Sprite CreateTreatSprite(){const int s=32;var t=new Texture2D(s,s,TextureFormat.RGBA32,false){filterMode=FilterMode.Point,wrapMode=TextureWrapMode.Clamp};var p=new Color[s*s];for(int y=0;y<s;y++)for(int x=0;x<s;x++){float dx=x-15.5f,dy=y-15.5f;bool body=(Mathf.Abs(dx)<9&&Mathf.Abs(dy)<5),left=((dx+10)*(dx+10)+dy*dy<30),right=((dx-10)*(dx-10)+dy*dy<30);Color c=Color.clear;if(body||left||right)c=new Color(.16f,.08f,.035f,1);if((Mathf.Abs(dx)<7&&Mathf.Abs(dy)<3)||((dx+10)*(dx+10)+dy*dy<15)||((dx-10)*(dx-10)+dy*dy<15))c=new Color(1,.58f,.14f,1);p[y*s+x]=c;}t.SetPixels(p);t.Apply(false,true);return Sprite.Create(t,new Rect(0,0,s,s),new Vector2(.5f,.5f),32);}
     }

@@ -21,7 +21,8 @@ namespace Nightfall.UnityMvp
             Register("hero_sam","Art/Generated/hero_sam_canonical__move__8dir__7fps__loop",6,8,-1,7,72,1.50f,new Color(.55f,.08f,.18f),1.38f);
             Register("hero_zike","Art/Generated/hero_zike_canonical__move__8dir__7fps__loop",6,8,-1,7,72,1.74f,new Color(.2f,.75f,1),1.38f);
             Register("enemy_zombie", "Art/enemy_zombie_move_8dir", 6, 8, -1, 7, 72, 1, new Color(.35f,.48f,.3f));
-            Register("enemy_drone", "Art/Generated/enemy_drone_idle", 1, 1, -1, 1, 96, .72f, new Color(.42f,.82f,.92f));
+            Register("enemy_drone", "Art/Generated/enemy_drone_idle_8dir", 1, 8, -1, 1, 96, .92f, new Color(.42f,.82f,.92f));
+            Register("boss_dragon", "Art/Bosses/boss_dragon__idle__8dir__1fps__loop", 1, 8, -1, 1, 160, 2.8f, new Color(.55f,.33f,.15f));
             Register("boss_assassin", "Art/Bosses/boss_assassin__idle__8dir__1fps__loop", 1, 8, -1, 1, 72, 1.1f, new Color(.08f,.08f,.1f));
             Register("boss_elite_agent", "Art/Bosses/boss_elite_agent__idle__8dir__1fps__loop", 1, 8, -1, 1, 96, 1.35f, new Color(.15f,.36f,.48f));
             Register("boss_mech", "Art/Bosses/boss_mech__idle__8dir__1fps__loop", 1, 8, -1, 1, 72, 2.15f, new Color(.43f,.48f,.52f));
@@ -68,7 +69,10 @@ namespace Nightfall.UnityMvp
             // Heroes use a deliberately tiny two-pose strip: neutral -> raised attacking
             // hand. It must never fall back to the old multi-frame attack exports, which
             // rotated/deformed the whole body and produced the carousel effect.
-            if(id.StartsWith("hero_"))AddOptionalClipResource(visual,"attack","Art/Generated/"+id+"_attack_pose_8dir",7,ppu,false);
+            if(id.StartsWith("hero_"))
+            {
+                if(id!="hero_amelia")AddOptionalClipResource(visual,"attack","Art/Generated/"+id+"_attack_pose_8dir",7,ppu,false);
+            }
             else AddOptionalClip(visual,id,"attack",12,ppu,false);
             AddOptionalClip(visual,id,"hit",12,ppu,false);AddOptionalClip(visual,id,"death",9,ppu,false);
             AddOptionalClip(visual,id,"cast",10,ppu,false);AddOptionalClip(visual,id,"dash",14,ppu,false);
